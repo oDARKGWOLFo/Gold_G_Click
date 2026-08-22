@@ -201,13 +201,13 @@ const AdController = window.Adsgram
     : null;
 
 function showAd() {
-    if (!AdController) {
-        alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
-        gold += 500;
-        updateUI();
-        saveDataToCloud();
-        return;
-    }
+    //if (!AdController) {
+       // alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
+       // gold += 500;
+      //  updateUI();
+      //saveDataToCloud();
+       // return;
+   // }
 
     AdController.show()
         .then((result) => {
