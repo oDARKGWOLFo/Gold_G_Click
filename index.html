@@ -495,8 +495,7 @@
             
             // СИНТАКСИС ПОДКЛЮЧЕНИЯ ИЗ ВАШЕЙ ВТОРОЙ ИГРЫ
             // ЗАМЕНИТЕ "43566" НА ВАШ НОВЫЙ ID БЛОКА ИЗ ADSGRAM
-            if (window.Adsgram && window.Adsgram.init) {
-                AdController = window.Adsgram.init({ blockId: "43566" });
+            const AdController = window.Adsgram.init({ blockId: "43566" });
             }
             
             if (window.Telegram && window.Telegram.WebApp) {
