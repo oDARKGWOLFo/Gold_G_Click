@@ -6,6 +6,16 @@ let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
 const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
 let leaderData = [];
 
+// ВКЛЮЧАЕМ СИСТЕМУ ТЕЛЕГРАМА НА СМАРТФОНЕ ИГРОКА
+function updateLocalEnergy(value) {
+        energy = value;
+        localStorage.setItem('local_energy', energy.toString()); // СОХРАНЯЕМ В БРАУЗЕР НА СМАРТФОНЕ
+        document.getElementById('energy-display').innerText = `ЭНЕРГИЯ: ${energy}/3`;
+        
+        if (window.Telegram && window.Telegram.WebApp.CloudStorage) {
+            window.Telegram.WebApp.CloudStorage.setItem('player_energy', energy.toString()); // И В ТЕЛЕГРАМ СИНХРОНИЗИРУЕМ
+        }
+}
 // Функция обновления текста на экране и сохранения данных
 function updateUI() {
     document.getElementById('goldBalance').innerText = gold;
