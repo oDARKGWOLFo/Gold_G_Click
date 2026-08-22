@@ -207,7 +207,7 @@ function showAd() {
       //  updateUI();
       //saveDataToCloud();
        // return;
-   // }
+    }
 
     AdController.show()
         .then((result) => {
