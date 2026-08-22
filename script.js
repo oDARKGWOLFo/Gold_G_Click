@@ -1,37 +1,32 @@
-// Инициализация баланса из памяти браузера (чтобы прогресс не пропадал)
+// Инициализация игровых данных из памяти браузера (чтобы прогресс не пропадал)
 let gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
 let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
+let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1; // Сила клика (по умолчанию 1)
 
 // Список базовых имён для генерации ТОП-100 ботов
 const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
 let leaderData = [];
 
-// ВКЛЮЧАЕМ СИСТЕМУ ТЕЛЕГРАМА НА СМАРТФОНЕ ИГРОКА
-function updateLocalEnergy(value) {
-        energy = value;
-        localStorage.setItem('local_energy', energy.toString()); // СОХРАНЯЕМ В БРАУЗЕР НА СМАРТФОНЕ
-        document.getElementById('energy-display').innerText = `ЭНЕРГИЯ: ${energy}/3`;
-        
-        if (window.Telegram && window.Telegram.WebApp.CloudStorage) {
-            window.Telegram.WebApp.CloudStorage.setItem('player_energy', energy.toString()); // И В ТЕЛЕГРАМ СИНХРОНИЗИРУЕМ
-        }
-}
-// Функция обновления текста на экране и сохранения данных
+// Функция обновления всего интерфейса игры
 function updateUI() {
     document.getElementById('goldBalance').innerText = gold;
     document.getElementById('diamondBalance').innerText = diamonds;
+    document.getElementById('click-power-display').innerText = `КЛИК: +${clickPower} G`;
+    
     localStorage.setItem('clicker_gold', gold);
     localStorage.setItem('clicker_diamonds', diamonds);
+    localStorage.setItem('clicker_power', clickPower.toString());
+    
     generateLeaderboard();
 }
 
-// Клик по золотой монете (+1 G)
+// Клик по монете
 function clickCoin() {
-    gold += 1;
+    gold += clickPower; // Добавляем столько золота, сколько прокачан клик
     updateUI();
 }
 
-// Обмен в магазине (1000 G -> 1 Алмаз)
+// Магазин: Обмен 1000 золота на 1 Алмаз
 function buyDiamond() {
     if (gold >= 1000) {
         gold -= 1000;
@@ -43,7 +38,19 @@ function buyDiamond() {
     }
 }
 
-// Управление отображением модальных окон
+// Магазин: Покупка +1 к клику за 100 Алмазов
+function buyClickUpgrade() {
+    if (diamonds >= 100) {
+        diamonds -= 100;
+        clickPower += 1; // Увеличиваем силу клика навсегда
+        updateUI();
+        alert(`Улучшение куплено! Теперь каждый клик приносит +${clickPower} G 🚀`);
+    } else {
+        alert("Недостаточно алмазов 💎 для покупки апгрейда!");
+    }
+}
+
+// Управление модальными окнами
 function openModal(id) {
     document.getElementById(id).style.display = 'flex';
 }
@@ -51,14 +58,18 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 
-// Динамическая генерация списка ТОП-100 игроков вокруг текущего баланса
+// Генерация Топ-100 с интеграцией реального имени из Telegram
 function generateLeaderboard() {
     leaderData = [];
     
-    // Добавляем реального игрока
-    leaderData.push({ name: "Вы (Выбранный профиль)", score: gold, isMe: true });
+    let telegramName = "Вы (Выбранный профиль)";
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+        const user = window.Telegram.WebApp.initDataUnsafe.user;
+        telegramName = user.first_name + (user.last_name ? " " + user.last_name : "");
+    }
     
-    // Генерируем 99 ботов с фиксированным шагом очков
+    leaderData.push({ name: telegramName, score: gold, isMe: true });
+    
     for (let i = 1; i <= 99; i++) {
         let botIndex = i % botNames.length;
         let botScore = 15000 - (i * 145) + (i % 3 === 0 ? 50 : -30); 
@@ -66,10 +77,8 @@ function generateLeaderboard() {
         leaderData.push({ name: `${botNames[botIndex]}_${i}`, score: botScore, isMe: false });
     }
 
-    // Сортируем список: у кого больше золота, тот выше
     leaderData.sort((a, b) => b.score - a.score);
 
-    // Очищаем и заново заполняем контейнер в HTML
     const listEl = document.getElementById('leaderboardList');
     if (listEl) {
         listEl.innerHTML = '';
@@ -82,43 +91,38 @@ function generateLeaderboard() {
     }
 }
 
-// Настройка интеграции AdsGram
-// ВНИМАНИЕ: Обязательно замените 'YOUR_BLOCK_ID' на ваш новый ID блока из AdsGram!
-// Флаг debug: true активирует безопасный тестовый режим рекламы, чтобы вас не забанили
+// Настройка AdsGram (debug: true защищает вас от банов во время собственных тестов)
+// Обязательно замените 'YOUR_BLOCK_ID' на ваш настоящий ID блока, когда выйдете в продакшн
 const AdController = window.Adsgram 
     ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
     : null;
 
-// Логика кнопки просмотра рекламы (+100 G)
 function showAd() {
     if (!AdController) {
-        // Запасной вариант на случай, если скрипт AdsGram заблокирован AdBlocker-ом
-        alert("Режим отладки: Adsgram не инициализирован. Начислено тестовое вознаграждение +100 G");
-        gold += 100;
+        alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
+        gold += 500;
         updateUI();
         return;
     }
 
     AdController.show()
         .then((result) => {
-            // Видео успешно досмотрено до конца
-            gold += 100;
+            gold += 500;
             updateUI();
-            alert("Реклама просмотрена! Вам начислено +100 G");
+            alert("Спасибо за просмотр! Вам начислено 500 G");
         })
         .catch((result) => {
-            // Пользователь закрыл рекламу раньше времени или произошла ошибка
-            console.error("AdsGram ошибка или пропуск:", result);
-            alert("Реклама не была досмотрена до конца. Награда не начислена.");
+            console.error("Ad error:", result);
+            alert("Реклама не была досмотрена или возникла ошибка соединения.");
         });
 }
 
-// Первоначальный запуск интерфейса при загрузке страницы
+// Запуск при старте страницы
 document.addEventListener("DOMContentLoaded", () => {
     updateUI();
-        
-
- if (window.Telegram && window.Telegram.WebApp) {
+    
+    if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
- }       
+        window.Telegram.WebApp.expand(); // Разворачивает Mini App на всю высоту экрана телефона
+    }
 });
