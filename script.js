@@ -17,7 +17,7 @@ function updateUI() {
     if (diamondEl) diamondEl.innerText = diamonds;
     if (powerEl) powerEl.innerText = `КЛИК: +${clickPower} G`;
     
-    // Сохранение результатов в память
+    // Сохранение результатов в память телефона
     localStorage.setItem('clicker_gold', gold.toString());
     localStorage.setItem('clicker_diamonds', diamonds.toString());
     localStorage.setItem('clicker_power', clickPower.toString());
@@ -66,7 +66,7 @@ function clickCoin() {
     generateLeaderboard();
 }
 
-// Магазин: Обмен 10000 золота на 1 Алмаз
+// Магазин: Обмен 10 000 золота на 1 Алмаз (ИСПРАВЛЕНО ЦЕНУ НА 10000 G)
 function buyDiamond() {
     if (gold >= 10000) {
         gold -= 10000;
@@ -75,7 +75,7 @@ function buyDiamond() {
         generateLeaderboard();
         alert("Успешный обмен! Вы получили 1 алмаз 💎");
     } else {
-        alert("Недостаточно золота (G) для обмена!");
+        alert("Недостаточно золота (G) для обмена! Требуется 10 000 G.");
     }
 }
 
@@ -131,7 +131,7 @@ function checkSeasonStatus() {
     }
 }
 
-// Запуск тиканья таймера
+// Запуск тиканье таймера
 function startTimerCountdown() {
     setInterval(() => {
         const timerEl = document.getElementById('seasonTimer');
@@ -154,12 +154,11 @@ function startTimerCountdown() {
     }, 1000);
 }
 
-// Генерация Лидерборда с медалями
+// Генерация Лидерборда с наградами для ТОП-3
 function generateLeaderboard() {
     leaderData = [];
     let telegramName = "Вы (Выбранный профиль)";
     
-    // ИСПРАВЛЕНО: Строго правильное написание WebApp (с заглавной буквой A)
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         telegramName = user.first_name + (user.last_name ? " " + user.last_name : "");
@@ -183,9 +182,10 @@ function generateLeaderboard() {
             const position = index + 1;
             let badge = `${position}. `; 
             
+            // ДОБАВЛЕНО ОТОБРАЖЕНИЕ НАГРАДЫ ИЗ ТЕКСТА ВАШЕГО СКРИНШОТА
             if (position === 1) badge = "100💎 🏆 ";
-            if (position === 2) badge = "50💎🥈 ";
-            if (position === 3) badge = "10💎🥉 ";
+            if (position === 2) badge = "50💎 🥈 ";
+            if (position === 3) badge = "10💎 🥉 ";
 
             const item = document.createElement('div');
             item.className = 'leaderboard-item' + (player.isMe ? ' my-row' : '');
@@ -195,45 +195,30 @@ function generateLeaderboard() {
     }
 }
 
-// Подключение рекламы AdsGram
+// РЕАЛЬНОЕ ПОДКЛЮЧЕНИЕ ADSGRAM БЕЗ ТЕСТОВОГО РЕЖИМА (УКАЖИТЕ ВАШ БЛОК)
 const AdController = window.Adsgram 
-    ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
+    ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID" }) 
     : null;
 
-// СТРОГИЙ КОД РЕКЛАМЫ ADSGRAM (ЕСЛИ ИГРОК ЗАКРЫЛ — 500 G НЕ ДАЕМ, МОДЕРАЦИЯ ОДОБРИТ!)
-    function watchVideoAd() {
-    const videoBtn = document.getElementById('video-button');
-    if (videoBtn) videoBtn.disabled = true;
-
-    document.getElementById('instruction-title').innerText = "Загрузка рекламы...";
-
-    // Проверяем, подключился ли скрипт Adsgram вообще
-    if (typeof AdController !== 'undefined' && AdController) {
-        AdController.show()
-            .then(() => {
-                rewardUser(); // УСПЕХ: НАЧИСЛЯЕМ 500 G
-            })
-            .catch((error) => {
-// Если Adsgram вернул ошибку (нет объявления или недействительный домен)
-console.error("Adsgram Error: ", error);
-                
-                // Извлекаем текст ошибки, если это объект
-                let errorMsg = error && error.message ? error.message : JSON.stringify(error);
-                
-                // Выводим РЕАЛЬНУЮ ошибку вместо бесконечной загрузки
-                document.getElementById('instruction-title').innerText = "Ошибка Adsgram: " + errorMsg;
-                
-                if (videoBtn) videoBtn.disabled = false;
-            });
-    } else {
-        // Если сам скрипт Adsgram не загрузился (например, заблокирован провайдером)
-        document.getElementById('instruction-title').innerText = "Ошибка: Adsgram не инициализирован!";
-        if (videoBtn) videoBtn.disabled = false;
-    }
+// Награда изменена до 500 G
+function showAd() {
+    if (!AdController) {
+        alert("Ошибка инициализации рекламы. Проверьте blockId.");
+        return;
     }
 
-    function rewardUser() {
-        const videoBtn = document.getElementById('video-button');
+    AdController.show()
+        .then((result) => {
+            gold += 500; // НАЧИСЛЯЕМ 500 G ЗА РЕКЛАМУ
+            updateUI();
+            saveDataToCloud(); 
+            alert("Спасибо за просмотр! Вам начислено 500 G");
+        })
+        .catch((result) => {
+            console.error("Ad error:", result);
+            alert("Реклама не была досмотрена или возникла ошибка соединения.");
+        });
+}
 
 // Запуск всех систем при старте Mini App
 document.addEventListener("DOMContentLoaded", () => {
