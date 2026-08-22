@@ -227,22 +227,33 @@ function showAd() {
 }
 
 // Сохраняем результат
-        localStorage.setItem('local_energy', energy.toString());
-        localStorage.setItem('local_cooldown', energyCooldown.toString());
-        
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
-            window.Telegram.WebApp.CloudStorage.setItem('player_energy', energy.toString(), () => {});
-        }
+function saveDataToCloud() {
+    // Сначала сохраняем локально на смартфоне
+    localStorage.setItem('clicker_gold', gold.toString());
+    localStorage.setItem('clicker_diamonds', diamonds.toString());
+    localStorage.setItem('clicker_power', clickPower.toString());
+    localStorage.setItem('next_reset_time', nextResetTime.toString());
+
+    // Затем отправляем данные в железное Облако Telegram
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_power', clickPower.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_reset_time', nextResetTime.toString());
     }
 }
 
-// Запускаем проверку при открытии игры
-applyOfflineProgress();
-
-// Запускаем проверку, если игру просто свернули/развернули
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        applyOfflineProgress();
+// АБСОЛЮТНО СИНХРОННЫЙ ЗАПУСК ВСЕХ РЕСУРСОВ ИГРЫ ПРИ СТАРТЕ СТРАНИЦЫ
+document.addEventListener("DOMContentLoaded", () => {
+    updateUI();            // 1. Сразу выводим баланс на экран
+    checkSeasonStatus();   // 2. Проверяем статус недели
+    generateLeaderboard(); // 3. Строим рейтинг игроков
+    startTimerCountdown(); // 4. Запускаем тиканье таймера
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
     }
+    
+    syncWithTelegramCloud(); // 5. В фоне запрашиваем Облако Telegram
 });
-// ==========================================
