@@ -1,4 +1,4 @@
-// ГИБРИДНАЯ ЗАГРУЗКА: Мгновенно берем данные из локальной памяти, чтобы экран не был пустым
+// Инициализация игровых данных из памяти браузера
 let gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
 let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
 let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
@@ -7,7 +7,7 @@ let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
 const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
 let leaderData = [];
 
-// ФУНКЦИЯ ДЛЯ СИНХРОННОГО ВЫВОДА РЕСУРСОВ НА ЭКРАН
+// Функция синхронного вывода ресурсов на экран
 function updateUI() {
     const goldEl = document.getElementById('goldBalance');
     const diamondEl = document.getElementById('diamondBalance');
@@ -17,17 +17,16 @@ function updateUI() {
     if (diamondEl) diamondEl.innerText = diamonds;
     if (powerEl) powerEl.innerText = `КЛИК: +${clickPower} G`;
     
-    // Дублируем сохранение в локальную память смартфона для мгновенных перезагрузок
+    // Дублируем сохранение в локальную память смартфона
     localStorage.setItem('clicker_gold', gold.toString());
     localStorage.setItem('clicker_diamonds', diamonds.toString());
     localStorage.setItem('clicker_power', clickPower.toString());
     localStorage.setItem('next_reset_time', nextResetTime.toString());
 }
 
-// ФОНОВАЯ СИНХРОНИЗАЦИЯ С ОБЛАКОМ ТЕЛЕГРАМА
+// Фоновая синхронизация с облаком Telegram
 function syncWithTelegramCloud() {
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
-        // Запрашиваем данные из облака
         window.Telegram.WebApp.CloudStorage.getItems(['cloud_gold', 'cloud_diamonds', 'cloud_power', 'cloud_reset_time'], (err, values) => {
             if (!err && values) {
                 let cloudGold = parseInt(values.cloud_gold) || 0;
@@ -35,13 +34,11 @@ function syncWithTelegramCloud() {
                 let cloudPower = parseInt(values.cloud_power) || 1;
                 let cloudResetTime = parseInt(values.cloud_reset_time) || 0;
 
-                // Если в облаке прогресс больше, чем на телефоне — обновляем локальные переменные
                 if (cloudGold > gold) gold = cloudGold;
                 if (cloudDiamonds > diamonds) diamonds = cloudDiamonds;
                 if (cloudPower > clickPower) clickPower = cloudPower;
                 if (cloudResetTime > nextResetTime && cloudResetTime !== 0) nextResetTime = cloudResetTime;
 
-                // Перерисовываем интерфейс с новыми данными из облака
                 checkSeasonStatus();
                 updateUI();
                 generateLeaderboard();
@@ -50,11 +47,10 @@ function syncWithTelegramCloud() {
     }
 }
 
-// ФУНКЦИЯ ДЛЯ ЖЕЛЕЗНОГО СОХРАНЕНИЯ В ОБЛАКО
+// Функция для сохранения результатов в Облако
 function saveDataToCloud() {
-    updateUI(); // Сначала обновляем локально
+    updateUI(); 
 
-    // Затем отправляем в облако Telegram
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
         window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
         window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
@@ -164,6 +160,7 @@ function generateLeaderboard() {
     leaderData = [];
     let telegramName = "Вы (Выбранный профиль)";
     
+    // ИСПРАВЛЕНО: буква A теперь большая в WebApp
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         telegramName = user.first_name + (user.last_name ? " " + user.last_name : "");
@@ -199,15 +196,15 @@ function generateLeaderboard() {
     }
 }
 
-// Реклама AdsGram
+// Настройка AdsGram
 const AdController = window.Adsgram 
     ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
     : null;
 
 function showAd() {
     if (!AdController) {
-        alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
-        gold += 500;
+        alert("Режим тестирования: Adsgram не найден. Начислено +100 G");
+        gold += 100;
         updateUI();
         saveDataToCloud();
         return;
@@ -215,10 +212,10 @@ function showAd() {
 
     AdController.show()
         .then((result) => {
-            gold += 500;
+            gold += 100;
             updateUI();
             saveDataToCloud(); 
-            alert("Спасибо за просмотр! Вам начислено 500 G");
+            alert("Спасибо за просмотр! Вам начислено 100 G");
         })
         .catch((result) => {
             console.error("Ad error:", result);
@@ -226,34 +223,17 @@ function showAd() {
         });
 }
 
-// Сохраняем результат
-function saveDataToCloud() {
-    // Сначала сохраняем локально на смартфоне
-    localStorage.setItem('clicker_gold', gold.toString());
-    localStorage.setItem('clicker_diamonds', diamonds.toString());
-    localStorage.setItem('clicker_power', clickPower.toString());
-    localStorage.setItem('next_reset_time', nextResetTime.toString());
-
-    // Затем отправляем данные в железное Облако Telegram
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
-        window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
-        window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
-        window.Telegram.WebApp.CloudStorage.setItem('cloud_power', clickPower.toString());
-        window.Telegram.WebApp.CloudStorage.setItem('cloud_reset_time', nextResetTime.toString());
-    }
-}
-
-// АБСОЛЮТНО СИНХРОННЫЙ ЗАПУСК ВСЕХ РЕСУРСОВ ИГРЫ ПРИ СТАРТЕ СТРАНИЦЫ
+// Абсолютно синхронный запуск ресурсов при старте
 document.addEventListener("DOMContentLoaded", () => {
-    updateUI();            // 1. Сразу выводим баланс на экран
-    checkSeasonStatus();   // 2. Проверяем статус недели
-    generateLeaderboard(); // 3. Строим рейтинг игроков
-    startTimerCountdown(); // 4. Запускаем тиканье таймера
+    updateUI();            
+    checkSeasonStatus();   
+    generateLeaderboard(); 
+    startTimerCountdown(); 
     
     if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
     
-    syncWithTelegramCloud(); // 5. В фоне запрашиваем Облако Telegram
+    syncWithTelegramCloud(); 
 });
