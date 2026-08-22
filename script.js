@@ -200,26 +200,40 @@ const AdController = window.Adsgram
     ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
     : null;
 
-function showAd() {
-    //if (!AdController) {
-       // alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
-       // gold += 500;
-      //  updateUI();
-      //saveDataToCloud();
-       // return;
+// СТРОГИЙ КОД РЕКЛАМЫ ADSGRAM (ЕСЛИ ИГРОК ЗАКРЫЛ — ЭНЕРГИЮ НЕ ДАЕМ, МОДЕРАЦИЯ ОДОБРИТ!)
+    function watchVideoAd() {
+    const videoBtn = document.getElementById('video-button');
+    if (videoBtn) videoBtn.disabled = true;
+
+    document.getElementById('instruction-title').innerText = "Загрузка рекламы...";
+
+    // Проверяем, подключился ли скрипт Adsgram вообще
+    if (typeof AdController !== 'undefined' && AdController) {
+        AdController.show()
+            .then(() => {
+                rewardUser(); // УСПЕХ: НАЧИСЛЯЕМ 500G
+            })
+            .catch((error) => {
+// Если Adsgram вернул ошибку (нет объявления или недействительный домен)
+console.error("Adsgram Error: ", error);
+                
+                // Извлекаем текст ошибки, если это объект
+                let errorMsg = error && error.message ? error.message : JSON.stringify(error);
+                
+                // Выводим РЕАЛЬНУЮ ошибку вместо бесконечной загрузки
+                document.getElementById('instruction-title').innerText = "Ошибка Adsgram: " + errorMsg;
+                
+                if (videoBtn) videoBtn.disabled = false;
+            });
+    } else {
+        // Если сам скрипт Adsgram не загрузился (например, заблокирован провайдером)
+        document.getElementById('instruction-title').innerText = "Ошибка: Adsgram не инициализирован!";
+        if (videoBtn) videoBtn.disabled = false;
+    }
     }
 
-    AdController.show()
-        .then((result) => {
-            gold += 500;
-            updateUI();
-            saveDataToCloud(); 
-            alert("Спасибо за просмотр! Вам начислено 500 G");
-        })
-        .catch((result) => {
-            console.error("Ad error:", result);
-            alert("Реклама не была досмотрена или возникла ошибка соединения.");
-        });
+    function rewardUser() {
+        const videoBtn = document.getElementById('video-button');
 }
 
 // Запуск всех систем при старте Mini App
