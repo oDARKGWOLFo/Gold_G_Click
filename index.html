@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coin Clicker Mini App</title>
+    <!-- Подключаем официальный скрипт AdsGram -->
+    <script src="https://adsgram.ai"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Верхняя панель навигации */
+        .top-bar {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .nav-btn {
+            background: transparent;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-btn:active {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        /* Панель баланса по центру (как на скриншоте) */
+        .balance-container {
+            border: 2px solid #FFD700;
+            border-radius: 12px;
+            padding: 10px 25px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            min-width: 160px;
+        }
+        .balance-item {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFFFFF;
+            margin: 2px 0;
+        }
+        .gold-text { color: #FFD700; }
+        .diamond-text { color: #00E5FF; }
+
+        /* Игровая зона по центру */
+        .game-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .coin-btn {
+            background: #000000;
+            border: 4px solid #000000; /* Черная рамка вокруг монеты */
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            transition: transform 0.05s;
+        }
+        .coin-btn:active {
+            transform: scale(0.92);
+        }
+        .coin-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Нижняя кнопка просмотра рекламы */
+        .ad-btn {
+            width: 100%;
+            max-width: 350px;
+            background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%);
+            color: #000000;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        .ad-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* Окна интерфейса (Модалки) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #111111;
+            border: 2px solid #FFD700; /* Золотая рамка для окон */
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .modal-title {
+            color: #FFD700;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #FFD700;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Списки внутри окон */
+        .leaderboard-list {
+            max-height: 250px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 5px;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+        }
+        .my-row {
+            background: rgba(255, 215, 0, 0.15);
+            font-weight: bold;
+            color: #FFD700;
+        }
+        .shop-box {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        .action-btn {
+            background: transparent;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        .action-btn:active {
+            background: rgba(255, 215, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навигация и баланс -->
+    <div class="top-bar">
+        <button class="nav-btn" onclick="openModal('leaderboardModal')">🏆 ТОП 100</button>
+        
+        <div class="balance-container">
+            <div class="balance-item"><span id="goldBalance">0</span> <span class="gold-text">G</span></div>
+            <div class="balance-item"><span id="diamondBalance">0</span> <span class="diamond-text">💎</span></div>
+        </div>
+        
+        <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
+    </div>
+
+    <!-- Кликер: Монета в черной рамке -->
+    <div class="game-area">
+        <button class="coin-btn" onclick="clickCoin()">
+            <svg class="coin-img" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="#FFD700" stroke="#B8860B" stroke-width="4"/>
+                <circle cx="50" cy="50" r="37" fill="#FFD700" stroke="#DAA520" stroke-width="2" stroke-dasharray="4"/>
+                <text x="50" y="58" font-size="26" font-weight="bold" fill="#B8860B" text-anchor="middle">G</text>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Кнопка рекламы -->
+    <button class="ad-btn" onclick="showAd()">
+        🎬 Посмотреть рекламу (+100 G)
+    </button>
+
+    <!-- Окно ТОП 100 -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
+            <div class="modal-title">Топ 100 игроков</div>
+            <div class="leaderboard-list" id="leaderboardList">
+                <!-- Сюда JS добавит игроков -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Окно Магазина -->
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
+            <div class="modal-title">Магазин</div>
+            <div class="shop-box">
+                Обмен:<br><b class="gold-text">1000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
+            </div>
+            <button class="action-btn" onclick="buyDiamond()">Обменять</button>
+        </div>
+    </div>
+
+    <!-- Скрипты будут во второй части -->
+    <script src="script.js"></script>
+</body>
+            </html>
