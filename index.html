@@ -77,8 +77,8 @@
             width: 100%;
         }
         .coin-btn {
-            background: #000000;
-            border: 4px solid #000000; /* Черная рамка вокруг монеты */
+            background: transparent; /* Убираем фоновый цвет кнопки */
+            border: none; /* Полностью убираем черную рамку, которая создавала квадрат */
             border-radius: 50%;
             width: 180px;
             height: 180px;
@@ -87,11 +87,14 @@
             justify-content: center;
             cursor: pointer;
             outline: none;
+            /* Убираем синее/зеленое выделение при клике на смартфонах */
+            -webkit-tap-highlight-color: transparent; 
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             transition: transform 0.05s;
         }
         .coin-btn:active {
             transform: scale(0.92);
+            outline: none;
         }
         .coin-img {
             width: 100%;
