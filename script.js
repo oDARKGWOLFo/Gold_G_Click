@@ -66,7 +66,7 @@ function clickCoin() {
     generateLeaderboard();
 }
 
-// Магазин: Обмен 1000 золота на 1 Алмаз
+// Магазин: Обмен 10000 золота на 1 Алмаз
 function buyDiamond() {
     if (gold >= 10000) {
         gold -= 10000;
