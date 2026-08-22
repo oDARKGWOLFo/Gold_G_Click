@@ -186,17 +186,17 @@ const AdController = window.Adsgram
 
 function showAd() {
     if (!AdController) {
-        alert("Режим тестирования: Adsgram не найден. Начислено +100 G");
-        gold += 100;
+        alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
+        gold += 500;
         updateUI();
         return;
     }
 
     AdController.show()
         .then((result) => {
-            gold += 100;
+            gold += 500;
             updateUI();
-            alert("Спасибо за просмотр! Вам начислено 100 G");
+            alert("Спасибо за просмотр! Вам начислено 500 G");
         })
         .catch((result) => {
             console.error("Ad error:", result);
