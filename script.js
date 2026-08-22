@@ -196,9 +196,7 @@ function generateLeaderboard() {
 }
 
 // РЕАЛЬНОЕ ПОДКЛЮЧЕНИЕ ADSGRAM БЕЗ ТЕСТОВОГО РЕЖИМА (УКАЖИТЕ ВАШ БЛОК)
-const AdController = window.Adsgram 
-    ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID" }) 
-    : null;
+const AdController = window.Adsgram.init({ blockId: "12345" });
 
 // Награда изменена до 500 G
 function showAd() {
