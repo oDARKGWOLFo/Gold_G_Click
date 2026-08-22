@@ -466,14 +466,14 @@
             }
         }
 
-        function showAd() {
-            if (!AdController) {
-                alert("Режим отладки: Рекламный блок настраивается. Начислено +500 G");
-                gold += 500;
-                updateUI();
-                saveDataToCloud();
-                return;
-            }
+        //function showAd() {
+            //if (!AdController) {
+               // alert("Режим отладки: Рекламный блок настраивается. Начислено +500 G");
+               // gold += 500;
+                //updateUI();
+                //saveDataToCloud();
+                //return;
+           // }
 
             AdController.show()
                 .then((result) => {
