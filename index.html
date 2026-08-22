@@ -6,9 +6,9 @@
     <title>Gold G Clicker</title>
     
     <!-- ПОДКЛЮЧЕНИЕ СИСТЕМ ADSGRAM И TELEGRAM WEB APP -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+    <script src="https://adsgram.ai"></script>
+    <script src="https://telegram.org"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -30,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* Верхняя панель: Кнопки навигации и баланс */
+        /* Верхняя панель */
         .top-bar {
             display: flex;
             width: 100%;
@@ -70,8 +70,7 @@
         }
         .gold-text { color: #FFD700; }
         .diamond-text { color: #00E5FF; }
-
-        /* Игровая зона: Монета по центру */
+        /* Зона клика */
         .game-area {
             flex: 1;
             display: flex;
@@ -92,7 +91,7 @@
             justify-content: center;
             cursor: pointer;
             outline: none;
-            -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку выделения кнопки */
+            -webkit-tap-highlight-color: transparent;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             transition: transform 0.05s;
         }
@@ -106,7 +105,6 @@
             object-fit: contain;
         }
 
-        /* Текст силы клика под монетой */
         .info-text {
             font-size: 14px;
             font-weight: bold;
@@ -116,7 +114,6 @@
             margin-top: 5px;
         }
 
-        /* Блок таймера сезона внутри рейтинга */
         .timer-box {
             background: rgba(255, 215, 0, 0.1);
             border: 1px dashed #FFD700;
@@ -128,7 +125,7 @@
             font-weight: bold;
         }
 
-        /* Нижняя кнопка рекламы */
+        /* Кнопка рекламы */
         .ad-btn {
             width: 100%;
             max-width: 350px;
@@ -152,7 +149,7 @@
             opacity: 0.9;
         }
 
-        /* Модальные окна (Рейтинг и Магазин) */
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -191,7 +188,6 @@
             cursor: pointer;
         }
         
-        /* Списки игроков внутри рейтинга */
         .leaderboard-list {
             max-height: 250px;
             overflow-y: auto;
@@ -212,7 +208,6 @@
             color: #FFD700;
         }
         
-        /* Элементы Магазина */
         .shop-item-box {
             background: #1a1a1a;
             border: 1px solid #FFD700;
@@ -240,7 +235,6 @@
 </head>
 <body>
 
-    <!-- Верхняя панель -->
     <div class="top-bar">
         <button class="nav-btn" onclick="openModal('leaderboardModal')">🏆 ТОП 100</button>
         <div class="balance-container">
@@ -250,7 +244,6 @@
         <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
     </div>
 
-    <!-- Зона клика -->
     <div class="game-area">
         <button class="coin-btn" onclick="clickCoin()">
             <svg class="coin-img" viewBox="0 0 100 100">
@@ -262,12 +255,10 @@
         <div id="click-power-display" class="info-text">КЛИК: +1 G</div>
     </div>
 
-    <!-- Кнопка просмотра рекламы -->
     <button class="ad-btn" onclick="showAd()">
         🎬 Посмотреть рекламу (+500 G)
     </button>
 
-    <!-- Окно ТОП 100 -->
     <div id="leaderboardModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
@@ -277,13 +268,12 @@
         </div>
     </div>
 
-    <!-- Окно Магазина -->
     <div id="shopModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
             <div class="modal-title">Магазин</div>
             <div class="shop-item-box">
-                Обмен валюты:<br><b class="gold-text">10000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
+                Обмен валюты:<br><b class="gold-text">10 000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
                 <button class="action-btn" onclick="buyDiamond()">Обменять</button>
             </div>
             <div class="shop-item-box">
@@ -293,7 +283,230 @@
         </div>
     </div>
 
-    <!-- ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША С ТЕЛЕФОНА ЧЕРЕЗ ВЕРСИЮ СЦЕНАРИЯ -->
-    <script src="script.js?v=888"></script>
+    <script>
+        let gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
+        let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
+        let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
+        let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
+
+        let AdController = null;
+        const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
+        let leaderData = [];
+
+        function updateUI() {
+            const goldEl = document.getElementById('goldBalance');
+            const diamondEl = document.getElementById('diamondBalance');
+            const powerEl = document.getElementById('click-power-display');
+
+            if (goldEl) goldEl.innerText = gold;
+            if (diamondEl) diamondEl.innerText = diamonds;
+            if (powerEl) powerEl.innerText = `КЛИК: +${clickPower} G`;
+            
+            localStorage.setItem('clicker_gold', gold.toString());
+            localStorage.setItem('clicker_diamonds', diamonds.toString());
+            localStorage.setItem('clicker_power', clickPower.toString());
+            localStorage.setItem('next_reset_time', nextResetTime.toString());
+        }
+
+        function syncWithTelegramCloud() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+                window.Telegram.WebApp.CloudStorage.getItems(['cloud_gold', 'cloud_diamonds', 'cloud_power', 'cloud_reset_time'], (err, values) => {
+                    if (!err && values) {
+                        let cloudGold = parseInt(values.cloud_gold) || 0;
+                        let cloudDiamonds = parseInt(values.cloud_diamonds) || 0;
+                        let cloudPower = parseInt(values.cloud_power) || 1;
+                        let cloudResetTime = parseInt(values.cloud_reset_time) || 0;
+
+                        if (cloudGold > gold) gold = cloudGold;
+                        if (cloudDiamonds > diamonds) diamonds = cloudDiamonds;
+                        if (cloudPower > clickPower) clickPower = cloudPower;
+                        if (cloudResetTime > nextResetTime && cloudResetTime !== 0) nextResetTime = cloudResetTime;
+
+                        checkSeasonStatus();
+                        updateUI();
+                        generateLeaderboard();
+                    }
+                });
+            }
+        }
+
+        function saveDataToCloud() {
+            updateUI();
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+                window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
+                window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
+                window.Telegram.WebApp.CloudStorage.setItem('cloud_power', clickPower.toString());
+                window.Telegram.WebApp.CloudStorage.setItem('cloud_reset_time', nextResetTime.toString());
+            }
+        }
+
+        function clickCoin() {
+            gold += clickPower;
+            updateUI();
+            saveDataToCloud(); 
+            generateLeaderboard();
+        }
+
+        function buyDiamond() {
+            if (gold >= 10000) {
+                gold -= 10000;
+                diamonds += 1;
+                saveDataToCloud();
+                generateLeaderboard();
+                alert("Успешный обмен! Вы получили 1 алмаз 💎");
+            } else {
+                alert("Недостаточно золота (G) для обмена! Требуется 10 000 G.");
+            }
+        }
+
+        function buyClickUpgrade() {
+            if (diamonds >= 100) {
+                diamonds -= 100;
+                clickPower += 1;
+                saveDataToCloud();
+                alert(`Улучшение куплено! Теперь каждый клик приносит +${clickPower} G 🚀`);
+            } else {
+                alert("Недостаточно алмазов 💎 для покупки апгрейда!");
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function checkSeasonStatus() {
+            const now = Date.now();
+            if (nextResetTime === 0) {
+                nextResetTime = now + (7 * 24 * 60 * 60 * 1000);
+                saveDataToCloud();
+            }
+            if (now >= nextResetTime) {
+                generateLeaderboard();
+                const myRankIndex = leaderData.findIndex(player => player.isMe);
+                const myRankPosition = myRankIndex + 1; 
+                
+                let rewardDiamonds = 0;
+                if (myRankPosition === 1) rewardDiamonds = 100;
+                else if (myRankPosition === 2) rewardDiamonds = 50;
+                else if (myRankPosition === 3) rewardDiamonds = 10;
+
+                if (rewardDiamonds > 0) {
+                    diamonds += rewardDiamonds;
+                    alert(`Сезон окончен! Вы заняли ${myRankPosition} место и выиграли ${rewardDiamonds} 💎!`);
+                } else {
+                    alert(`Сезон окончен! Вы заняли ${myRankPosition} место. Попробуйте на следующей неделе!`);
+                }
+
+                gold = 0; 
+                nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+                saveDataToCloud();
+            }
+                }
+        function startTimerCountdown() {
+            setInterval(() => {
+                const timerEl = document.getElementById('seasonTimer');
+                if (!timerEl) return;
+                
+                const now = Date.now();
+                const timeLeft = nextResetTime - now;
+                
+                if (timeLeft <= 0) {
+                    checkSeasonStatus();
+                    return;
+                }
+                
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                
+                timerEl.innerText = `До обнуления: ${days}д ${hours}ч ${minutes}м ${seconds}с`;
+            }, 1000);
+        }
+
+        function generateLeaderboard() {
+            leaderData = [];
+            let telegramName = "Вы (Выбранный профиль)";
+            
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+                telegramName = user.first_name + (user.last_name ? " " + user.last_name : "");
+            }
+            
+            leaderData.push({ name: telegramName, score: gold, isMe: true });
+            
+            for (let i = 1; i <= 99; i++) {
+                let botIndex = i % botNames.length;
+                let botScore = 8000 - (i * 80) + (i % 3 === 0 ? 30 : -20); 
+                if (botScore < 0) botScore = 0;
+                leaderData.push({ name: `${botNames[botIndex]}_${i}`, score: botScore, isMe: false });
+            }
+
+            leaderData.sort((a, b) => b.score - a.score);
+
+            const listEl = document.getElementById('leaderboardList');
+            if (listEl) {
+                listEl.innerHTML = '';
+                leaderData.forEach((player, index) => {
+                    const position = index + 1;
+                    let badge = `${position}. `; 
+                    
+                    if (position === 1) badge = "100💎 🏆 ";
+                    if (position === 2) badge = "50💎 🥈 ";
+                    if (position === 3) badge = "10💎 🥉 ";
+
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item' + (player.isMe ? ' my-row' : '');
+                    item.innerHTML = `<span>${badge}${player.name}</span><span>${player.score} G</span>`;
+                    listEl.appendChild(item);
+                });
+            }
+        }
+
+        function showAd() {
+            if (!AdController) {
+                alert("Режим отладки: Рекламный блок настраивается. Начислено +500 G");
+                gold += 500;
+                updateUI();
+                saveDataToCloud();
+                return;
+            }
+
+            AdController.show()
+                .then((result) => {
+                    gold += 500;
+                    updateUI();
+                    saveDataToCloud(); 
+                    alert("Спасибо за просмотр! Вам начислено 500 G");
+                })
+                .catch((result) => {
+                    console.error("Ad error:", result);
+                    alert("Реклама не была досмотрена или возникла ошибка соединения.");
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateUI();            
+            checkSeasonStatus();   
+            generateLeaderboard(); 
+            startTimerCountdown(); 
+            
+            // СИНТАКСИС ПОДКЛЮЧЕНИЯ ИЗ ВАШЕЙ ВТОРОЙ ИГРЫ
+            // ЗАМЕНИТЕ "43566" НА ВАШ НОВЫЙ ID БЛОКА ИЗ ADSGRAM
+            if (window.Adsgram && window.Adsgram.init) {
+                AdController = window.Adsgram.init({ blockId: "43566" });
+            }
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            }
+            
+            syncWithTelegramCloud(); 
+        });
+    </script>
 </body>
-                </html>
+</html>
