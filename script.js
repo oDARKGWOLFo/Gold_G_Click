@@ -68,8 +68,8 @@ function clickCoin() {
 
 // Магазин: Обмен 1000 золота на 1 Алмаз
 function buyDiamond() {
-    if (gold >= 1000) {
-        gold -= 1000;
+    if (gold >= 10000) {
+        gold -= 10000;
         diamonds += 1;
         saveDataToCloud();
         generateLeaderboard();
@@ -183,9 +183,9 @@ function generateLeaderboard() {
             const position = index + 1;
             let badge = `${position}. `; 
             
-            if (position === 1) badge = "🏆 ";
-            if (position === 2) badge = "🥈 ";
-            if (position === 3) badge = "🥉 ";
+            if (position === 1) badge = "100💎 🏆 ";
+            if (position === 2) badge = "50💎🥈 ";
+            if (position === 3) badge = "10💎🥉 ";
 
             const item = document.createElement('div');
             item.className = 'leaderboard-item' + (player.isMe ? ' my-row' : '');
@@ -202,8 +202,8 @@ const AdController = window.Adsgram
 
 function showAd() {
     if (!AdController) {
-        alert("Режим тестирования: Adsgram не найден. Начислено +100 G");
-        gold += 100;
+        alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
+        gold += 500;
         updateUI();
         saveDataToCloud();
         return;
@@ -211,10 +211,10 @@ function showAd() {
 
     AdController.show()
         .then((result) => {
-            gold += 100;
+            gold += 500;
             updateUI();
             saveDataToCloud(); 
-            alert("Спасибо за просмотр! Вам начислено 100 G");
+            alert("Спасибо за просмотр! Вам начислено 500 G");
         })
         .catch((result) => {
             console.error("Ad error:", result);
