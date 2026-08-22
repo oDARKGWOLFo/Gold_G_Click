@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coin Clicker Mini App</title>
-    <!-- ПОДКЛЮЧАЕМ СИСТЕМЫ ИГРЫ ТЕЛЕГРАМА И РЕКЛАМЫ (ВАШИ СТАРЫЕ ССЫЛКИ, КОТОРЫЕ МЫ НЕ ТРОГАЕМ) -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- ПОДКЛЮЧАЕМ СИСТЕМЫ ИГРЫ ТЕЛЕГРАМА И РЕКЛАМЫ -->
+    <script src="https://adsgram.ai"></script>
+    <script src="https://telegram.org"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -51,7 +53,7 @@
             background: rgba(255, 215, 0, 0.2);
         }
 
-        /* Панель баланса по центру (как на скриншоте) */
+        /* Панель баланса по центру */
         .balance-container {
             border: 2px solid #FFD700;
             border-radius: 12px;
@@ -73,13 +75,15 @@
         .game-area {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
+            gap: 15px;
         }
         .coin-btn {
-            background: transparent; /* Убираем фоновый цвет кнопки */
-            border: none; /* Полностью убираем черную рамку, которая создавала квадрат */
+            background: transparent;
+            border: none;
             border-radius: 50%;
             width: 180px;
             height: 180px;
@@ -88,8 +92,7 @@
             justify-content: center;
             cursor: pointer;
             outline: none;
-            /* Убираем синее/зеленое выделение при клике на смартфонах */
-            -webkit-tap-highlight-color: transparent; 
+            -webkit-tap-highlight-color: transparent; /* Полностью убирает синий квадрат при клике */
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             transition: transform 0.05s;
         }
@@ -101,6 +104,16 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        /* Текст силы клика под монетой */
+        .info-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00E5FF;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-top: 5px;
         }
 
         /* Нижняя кнопка просмотра рекламы */
@@ -143,7 +156,7 @@
         }
         .modal-content {
             background: #111111;
-            border: 2px solid #FFD700; /* Золотая рамка для окон */
+            border: 2px solid #FFD700; /* Золотые рамки окон */
             border-radius: 16px;
             width: 100%;
             max-width: 320px;
@@ -185,20 +198,27 @@
             font-weight: bold;
             color: #FFD700;
         }
-        .shop-box {
-            margin: 20px 0;
-            font-size: 16px;
+        
+        /* Кнопки и блоки магазина в золотой рамке */
+        .shop-item-box {
+            background: #1a1a1a;
+            border: 1px solid #FFD700;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 15px;
         }
         .action-btn {
             background: transparent;
             color: #FFD700;
             border: 2px solid #FFD700;
             border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 15px;
+            padding: 8px 15px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
+            margin-top: 8px;
         }
         .action-btn:active {
             background: rgba(255, 215, 0, 0.2);
@@ -219,7 +239,7 @@
         <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
     </div>
 
-    <!-- Кликер: Монета в черной рамке -->
+    <!-- Кликер зона без энергии -->
     <div class="game-area">
         <button class="coin-btn" onclick="clickCoin()">
             <svg class="coin-img" viewBox="0 0 100 100">
@@ -228,6 +248,8 @@
                 <text x="50" y="58" font-size="26" font-weight="bold" fill="#B8860B" text-anchor="middle">G</text>
             </svg>
         </button>
+        <!-- Сила клика -->
+        <div id="click-power-display" class="info-text">КЛИК: +1 G</div>
     </div>
 
     <!-- Кнопка рекламы -->
@@ -240,25 +262,31 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
             <div class="modal-title">Топ 100 игроков</div>
-            <div class="leaderboard-list" id="leaderboardList">
-                <!-- Сюда JS добавит игроков -->
-            </div>
+            <div class="leaderboard-list" id="leaderboardList"></div>
         </div>
     </div>
 
-    <!-- Окно Магазина -->
+    <!-- Окно Магазина с двумя товарами -->
     <div id="shopModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
             <div class="modal-title">Магазин</div>
-            <div class="shop-box">
-                Обмен:<br><b class="gold-text">1000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
+            
+            <!-- Товар 1: Обмен валюты -->
+            <div class="shop-item-box">
+                Обмен валюты:<br><b class="gold-text">1000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
+                <button class="action-btn" onclick="buyDiamond()">Обменять</button>
             </div>
-            <button class="action-btn" onclick="buyDiamond()">Обменять</button>
+
+            <!-- Товар 2: Улучшение клика -->
+            <div class="shop-item-box">
+                Улучшение монеты:<br><b class="diamond-text">100 Алмазов 💎</b> ➡️ <b>+1 за клик навсегда</b>
+                <button class="action-btn" onclick="buyClickUpgrade()">Купить апгрейд</button>
+            </div>
         </div>
     </div>
 
-    <!-- Скрипты будут во второй части -->
+    <!-- Подключение файла логики -->
     <script src="script.js"></script>
 </body>
-            </html>
+</html>
