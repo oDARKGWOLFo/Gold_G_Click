@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Coin Clicker Mini App</title>
+    <title>Gold G Clicker</title>
     
-    <!-- ПОДКЛЮЧАЕМ СИСТЕМЫ ИГРЫ ТЕЛЕГРАМА И РЕКЛАМЫ -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- ПОДКЛЮЧЕНИЕ СИСТЕМ ADSGRAM И TELEGRAM WEB APP -->
+    <script src="https://adsgram.ai"></script>
+    <script src="https://telegram.org"></script>
 
     <style>
         * {
@@ -30,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* Верхняя панель навигации */
+        /* Верхняя панель: Кнопки навигации и баланс */
         .top-bar {
             display: flex;
             width: 100%;
@@ -71,7 +71,7 @@
         .gold-text { color: #FFD700; }
         .diamond-text { color: #00E5FF; }
 
-        /* Игровая зона по центру */
+        /* Игровая зона: Монета по центру */
         .game-area {
             flex: 1;
             display: flex;
@@ -92,7 +92,7 @@
             justify-content: center;
             cursor: pointer;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку выделения кнопки */
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             transition: transform 0.05s;
         }
@@ -106,7 +106,7 @@
             object-fit: contain;
         }
 
-        /* Текст под монетой */
+        /* Текст силы клика под монетой */
         .info-text {
             font-size: 14px;
             font-weight: bold;
@@ -116,7 +116,7 @@
             margin-top: 5px;
         }
 
-        /* Блок таймера сезона над рейтингом */
+        /* Блок таймера сезона внутри рейтинга */
         .timer-box {
             background: rgba(255, 215, 0, 0.1);
             border: 1px dashed #FFD700;
@@ -128,7 +128,7 @@
             font-weight: bold;
         }
 
-        /* Нижняя кнопка просмотра рекламы */
+        /* Нижняя кнопка рекламы */
         .ad-btn {
             width: 100%;
             max-width: 350px;
@@ -152,7 +152,7 @@
             opacity: 0.9;
         }
 
-        /* Окна интерфейса (Модалки) */
+        /* Модальные окна (Рейтинг и Магазин) */
         .modal {
             display: none;
             position: fixed;
@@ -191,7 +191,7 @@
             cursor: pointer;
         }
         
-        /* Списки внутри окон */
+        /* Списки игроков внутри рейтинга */
         .leaderboard-list {
             max-height: 250px;
             overflow-y: auto;
@@ -212,7 +212,7 @@
             color: #FFD700;
         }
         
-        /* Стили магазинных товаров */
+        /* Элементы Магазина */
         .shop-item-box {
             background: #1a1a1a;
             border: 1px solid #FFD700;
@@ -240,19 +240,17 @@
 </head>
 <body>
 
-    <!-- Навигация и баланс -->
+    <!-- Верхняя панель -->
     <div class="top-bar">
         <button class="nav-btn" onclick="openModal('leaderboardModal')">🏆 ТОП 100</button>
-        
         <div class="balance-container">
             <div class="balance-item"><span id="goldBalance">0</span> <span class="gold-text">G</span></div>
             <div class="balance-item"><span id="diamondBalance">0</span> <span class="diamond-text">💎</span></div>
         </div>
-        
         <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
     </div>
 
-    <!-- Кликер зона -->
+    <!-- Зона клика -->
     <div class="game-area">
         <button class="coin-btn" onclick="clickCoin()">
             <svg class="coin-img" viewBox="0 0 100 100">
@@ -264,9 +262,9 @@
         <div id="click-power-display" class="info-text">КЛИК: +1 G</div>
     </div>
 
-    <!-- Кнопка рекламы -->
+    <!-- Кнопка просмотра рекламы -->
     <button class="ad-btn" onclick="showAd()">
-        🎬 Посмотреть рекламу (+500 G)
+        🎬 Посмотреть рекламу (+100 G)
     </button>
 
     <!-- Окно ТОП 100 -->
@@ -274,10 +272,7 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
             <div class="modal-title">Топ 100 игроков</div>
-            
-            <!-- БЛОК ТАЙМЕРА ДО КОНЦА НЕДЕЛИ -->
             <div id="seasonTimer" class="timer-box">До обнуления: --д --ч --м --с</div>
-            
             <div class="leaderboard-list" id="leaderboardList"></div>
         </div>
     </div>
@@ -287,12 +282,10 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
             <div class="modal-title">Магазин</div>
-            
             <div class="shop-item-box">
-                Обмен валюты:<br><b class="gold-text">10000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
+                Обмен валюты:<br><b class="gold-text">1000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
                 <button class="action-btn" onclick="buyDiamond()">Обменять</button>
             </div>
-
             <div class="shop-item-box">
                 Улучшение монеты:<br><b class="diamond-text">100 Алмазов 💎</b> ➡️ <b>+1 за клик навсегда</b>
                 <button class="action-btn" onclick="buyClickUpgrade()">Купить апгрейд</button>
@@ -300,6 +293,7 @@
         </div>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <!-- ПРИНУДИТЕЛЬНЫЙ СБРОС КЭША С ТЕЛЕФОНА ЧЕРЕЗ ВЕРСИЮ СЦЕНАРИЯ -->
+    <script src="script.js?v=777"></script>
 </body>
-</html>
+                </html>
