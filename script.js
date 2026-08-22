@@ -206,8 +206,8 @@ function showAd() {
 
 // Запуск при старте
 document.addEventListener("DOMContentLoaded", () => {
-    checkSeasonStatus(); // Проверяем, не пора ли обнулить сезон
-    updateUI();
+    updateUI(); // ПОКАЗЫВАЕМ БАЛАНС В ПЕРВУЮ ЖЕ СЕКУНДУ
+    checkSeasonStatus(); // Проверяем статус сезона
     startTimerCountdown(); // Запускаем тиканье таймера
     
     if (window.Telegram && window.Telegram.WebApp) {
