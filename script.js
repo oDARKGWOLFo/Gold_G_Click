@@ -116,4 +116,9 @@ function showAd() {
 // Первоначальный запуск интерфейса при загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
     updateUI();
+        
+
+ if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+ }       
 });
