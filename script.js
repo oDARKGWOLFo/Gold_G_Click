@@ -226,22 +226,23 @@ function showAd() {
         });
 }
 
-// АБСОЛЮТНО СИНХРОННЫЙ ЗАПУСК ВСЕХ РЕСУРСОВ ИГРЫ ПРИ СТАРТЕ СТРАНИЦЫ
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. Мгновенно выводим локальные данные на экран (баланс, сила клика)
-    updateUI();            
-    
-    // 2. Мгновенно строим рейтинг и запускаем таймер
-    checkSeasonStatus();   
-    generateLeaderboard(); 
-    startTimerCountdown(); 
-    
-    // 3. Сообщаем Телеграму, что приложение готово и разворачиваем его
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
+// Сохраняем результат
+        localStorage.setItem('local_energy', energy.toString());
+        localStorage.setItem('local_cooldown', energyCooldown.toString());
+        
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+            window.Telegram.WebApp.CloudStorage.setItem('player_energy', energy.toString(), () => {});
+        }
     }
-    
-    // 4. Тихо в фоновом режиме запрашиваем Облако Telegram (без блокировки экрана)
-    syncWithTelegramCloud(); 
+}
+
+// Запускаем проверку при открытии игры
+applyOfflineProgress();
+
+// Запускаем проверку, если игру просто свернули/развернули
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        applyOfflineProgress();
+    }
 });
+// ==========================================
