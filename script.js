@@ -200,7 +200,7 @@ const AdController = window.Adsgram
     ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
     : null;
 
-// СТРОГИЙ КОД РЕКЛАМЫ ADSGRAM (ЕСЛИ ИГРОК ЗАКРЫЛ — ЭНЕРГИЮ НЕ ДАЕМ, МОДЕРАЦИЯ ОДОБРИТ!)
+// СТРОГИЙ КОД РЕКЛАМЫ ADSGRAM (ЕСЛИ ИГРОК ЗАКРЫЛ — 500 G НЕ ДАЕМ, МОДЕРАЦИЯ ОДОБРИТ!)
     function watchVideoAd() {
     const videoBtn = document.getElementById('video-button');
     if (videoBtn) videoBtn.disabled = true;
@@ -211,7 +211,7 @@ const AdController = window.Adsgram
     if (typeof AdController !== 'undefined' && AdController) {
         AdController.show()
             .then(() => {
-                rewardUser(); // УСПЕХ: НАЧИСЛЯЕМ 500G
+                rewardUser(); // УСПЕХ: НАЧИСЛЯЕМ 500 G
             })
             .catch((error) => {
 // Если Adsgram вернул ошибку (нет объявления или недействительный домен)
@@ -234,7 +234,6 @@ console.error("Adsgram Error: ", error);
 
     function rewardUser() {
         const videoBtn = document.getElementById('video-button');
-}
 
 // Запуск всех систем при старте Mini App
 document.addEventListener("DOMContentLoaded", () => {
