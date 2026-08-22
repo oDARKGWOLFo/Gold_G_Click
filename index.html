@@ -6,8 +6,8 @@
     <title>Coin Clicker Mini App</title>
     
     <!-- ПОДКЛЮЧАЕМ СИСТЕМЫ ИГРЫ ТЕЛЕГРАМА И РЕКЛАМЫ -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://adsgram.ai"></script>
+    <script src="https://telegram.org"></script>
 
     <style>
         * {
@@ -92,7 +92,7 @@
             justify-content: center;
             cursor: pointer;
             outline: none;
-            -webkit-tap-highlight-color: transparent; /* Полностью убирает синий квадрат при клике */
+            -webkit-tap-highlight-color: transparent;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             transition: transform 0.05s;
         }
@@ -106,7 +106,7 @@
             object-fit: contain;
         }
 
-        /* Текст силы клика под монетой */
+        /* Текст под монетой */
         .info-text {
             font-size: 14px;
             font-weight: bold;
@@ -114,6 +114,18 @@
             letter-spacing: 0.5px;
             text-align: center;
             margin-top: 5px;
+        }
+
+        /* Блок таймера сезона над рейтингом */
+        .timer-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px dashed #FFD700;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 13px;
+            color: #FFD700;
+            margin-bottom: 12px;
+            font-weight: bold;
         }
 
         /* Нижняя кнопка просмотра рекламы */
@@ -156,7 +168,7 @@
         }
         .modal-content {
             background: #111111;
-            border: 2px solid #FFD700; /* Золотые рамки окон */
+            border: 2px solid #FFD700;
             border-radius: 16px;
             width: 100%;
             max-width: 320px;
@@ -192,6 +204,7 @@
             padding: 8px 5px;
             border-bottom: 1px solid #222;
             font-size: 14px;
+            align-items: center;
         }
         .my-row {
             background: rgba(255, 215, 0, 0.15);
@@ -199,7 +212,7 @@
             color: #FFD700;
         }
         
-        /* Кнопки и блоки магазина в золотой рамке */
+        /* Стили магазинных товаров */
         .shop-item-box {
             background: #1a1a1a;
             border: 1px solid #FFD700;
@@ -239,7 +252,7 @@
         <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
     </div>
 
-    <!-- Кликер зона без энергии -->
+    <!-- Кликер зона -->
     <div class="game-area">
         <button class="coin-btn" onclick="clickCoin()">
             <svg class="coin-img" viewBox="0 0 100 100">
@@ -248,13 +261,12 @@
                 <text x="50" y="58" font-size="26" font-weight="bold" fill="#B8860B" text-anchor="middle">G</text>
             </svg>
         </button>
-        <!-- Сила клика -->
         <div id="click-power-display" class="info-text">КЛИК: +1 G</div>
     </div>
 
     <!-- Кнопка рекламы -->
     <button class="ad-btn" onclick="showAd()">
-        🎬 Посмотреть рекламу (+500 G)
+        🎬 Посмотреть рекламу (+100 G)
     </button>
 
     <!-- Окно ТОП 100 -->
@@ -262,23 +274,25 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
             <div class="modal-title">Топ 100 игроков</div>
+            
+            <!-- БЛОК ТАЙМЕРА ДО КОНЦА НЕДЕЛИ -->
+            <div id="seasonTimer" class="timer-box">До обнуления: --д --ч --м --с</div>
+            
             <div class="leaderboard-list" id="leaderboardList"></div>
         </div>
     </div>
 
-    <!-- Окно Магазина с двумя товарами -->
+    <!-- Окно Магазина -->
     <div id="shopModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
             <div class="modal-title">Магазин</div>
             
-            <!-- Товар 1: Обмен валюты -->
             <div class="shop-item-box">
                 Обмен валюты:<br><b class="gold-text">1000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
                 <button class="action-btn" onclick="buyDiamond()">Обменять</button>
             </div>
 
-            <!-- Товар 2: Улучшение клика -->
             <div class="shop-item-box">
                 Улучшение монеты:<br><b class="diamond-text">100 Алмазов 💎</b> ➡️ <b>+1 за клик навсегда</b>
                 <button class="action-btn" onclick="buyClickUpgrade()">Купить апгрейд</button>
@@ -286,7 +300,6 @@
         </div>
     </div>
 
-    <!-- Подключение файла логики -->
     <script src="script.js"></script>
 </body>
 </html>
