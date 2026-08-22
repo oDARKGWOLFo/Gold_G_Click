@@ -1,15 +1,69 @@
-// Инициализация игровых данных из памяти браузера
-let gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
-let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
-let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
-
-// Переменные для таймера и еженедельного сброса
-let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
+// Инициализация игровых данных по умолчанию
+let gold = 0;
+let diamonds = 0;
+let clickPower = 1;
+let nextResetTime = 0;
 
 const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
 let leaderData = [];
 
-// Функция обновления всего интерфейса игры (срабатывает мгновенно)
+// ФУНКЦИЯ ДЛЯ ЗАГРУЗКИ ДАННЫХ ИЗ ОБЛАКА ТЕЛЕГРАМА ПРИ СТАРТЕ ИГРЫ
+function loadDataFromCloud() {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+        // Запрашиваем из облака сразу все ключи игры
+        window.Telegram.WebApp.CloudStorage.getItems(['cloud_gold', 'cloud_diamonds', 'cloud_power', 'cloud_reset_time'], (err, values) => {
+            if (!err) {
+                gold = parseInt(values.cloud_gold) || 0;
+                diamonds = parseInt(values.cloud_diamonds) || 0;
+                clickPower = parseInt(values.cloud_power) || 1;
+                nextResetTime = parseInt(values.cloud_reset_time) || 0;
+            } else {
+                console.error("Ошибка загрузки из облака, берем локальные данные:", err);
+                // Если облако выдало ошибку, берем данные из памяти телефона (резерв)
+                gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
+                diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
+                clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
+                nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
+            }
+            
+            // Как только данные получены — запускаем логику и показываем интерфейс
+            checkSeasonStatus();
+            updateUI();
+            generateLeaderboard();
+            startTimerCountdown();
+        });
+    } else {
+        // Если открыли вне телеграма (в обычном браузере), работаем через localStorage
+        gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
+        diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
+        clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
+        nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
+        
+        checkSeasonStatus();
+        updateUI();
+        generateLeaderboard();
+        startTimerCountdown();
+    }
+}
+
+// ФУНКЦИЯ ДЛЯ СОХРАНЕНИЯ ДАННЫХ В ОБЛАКО ТЕЛЕГРАМА
+function saveDataToCloud() {
+    // 1. Резервное сохранение в телефон
+    localStorage.setItem('clicker_gold', gold.toString());
+    localStorage.setItem('clicker_diamonds', diamonds.toString());
+    localStorage.setItem('clicker_power', clickPower.toString());
+    localStorage.setItem('next_reset_time', nextResetTime.toString());
+
+    // 2. Основное сохранение в Облако Telegram
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_power', clickPower.toString());
+        window.Telegram.WebApp.CloudStorage.setItem('cloud_reset_time', nextResetTime.toString());
+    }
+}
+
+// Функция обновления всего интерфейса игры
 function updateUI() {
     const goldEl = document.getElementById('goldBalance');
     const diamondEl = document.getElementById('diamondBalance');
@@ -18,17 +72,14 @@ function updateUI() {
     if (goldEl) goldEl.innerText = gold;
     if (diamondEl) diamondEl.innerText = diamonds;
     if (powerEl) powerEl.innerText = `КЛИК: +${clickPower} G`;
-    
-    localStorage.setItem('clicker_gold', gold);
-    localStorage.setItem('clicker_diamonds', diamonds);
-    localStorage.setItem('clicker_power', clickPower.toString());
 }
 
 // Клик по монете
 function clickCoin() {
     gold += clickPower;
     updateUI();
-    generateLeaderboard(); // Обновляем топ в реальном времени, если окно открыто
+    saveDataToCloud(); // Сохраняем в облако при каждом изменении баланса
+    generateLeaderboard();
 }
 
 // Магазин: Обмен 1000 золота на 1 Алмаз
@@ -37,6 +88,7 @@ function buyDiamond() {
         gold -= 1000;
         diamonds += 1;
         updateUI();
+        saveDataToCloud(); // Сохраняем в облако
         generateLeaderboard();
         alert("Успешный обмен! Вы получили 1 алмаз 💎");
     } else {
@@ -50,6 +102,7 @@ function buyClickUpgrade() {
         diamonds -= 100;
         clickPower += 1;
         updateUI();
+        saveDataToCloud(); // Сохраняем в облако
         alert(`Улучшение куплено! Теперь каждый клик приносит +${clickPower} G 🚀`);
     } else {
         alert("Недостаточно алмазов 💎 для покупки апгрейда!");
@@ -70,11 +123,10 @@ function checkSeasonStatus() {
     
     if (nextResetTime === 0) {
         nextResetTime = now + (7 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('next_reset_time', nextResetTime.toString());
+        saveDataToCloud();
     }
     
     if (now >= nextResetTime) {
-        // Логика завершения сезона
         generateLeaderboard();
         const myRankIndex = leaderData.findIndex(player => player.isMe);
         const myRankPosition = myRankIndex + 1; 
@@ -93,8 +145,8 @@ function checkSeasonStatus() {
 
         gold = 0; // Сброс золота за сезон
         nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('next_reset_time', nextResetTime.toString());
         updateUI();
+        saveDataToCloud(); // Сохраняем сброс в облако
     }
 }
 
@@ -161,23 +213,17 @@ function generateLeaderboard() {
     }
 }
 
-// Ваша оригинальная реклама (Не трогаем)
+// Оригинальная реклама
 const AdController = window.Adsgram 
     ? window.Adsgram.createAdController({ blockId: "YOUR_BLOCK_ID", debug: true }) 
     : null;
 
 function showAd() {
-    //if (!AdController) {
-    //    alert("Режим тестирования: Adsgram не найден. Начислено +500 G");
-    //    gold += 500;
-    //    updateUI();
-    //    return;
-    //}
-
     AdController.show()
         .then((result) => {
             gold += 500;
             updateUI();
+            saveDataToCloud(); // Сохраняем награду в облако
             alert("Спасибо за просмотр! Вам начислено 500 G");
         })
         .catch((result) => {
@@ -188,13 +234,12 @@ function showAd() {
 
 // СТРОГИЙ ЗАПУСК ИГРЫ ПРИ СТАРТЕ СТРАНИЦЫ
 document.addEventListener("DOMContentLoaded", () => {
-    updateUI();            // 1. СРАЗУ ПОКАЗЫВАЕМ БАЛАНС ИЗ ПАМЯТИ
-    checkSeasonStatus();   // 2. ПРОВЕРЯЕМ СЕЗОН
-    generateLeaderboard(); // 3. СТРОИМ РЕЙТИНГ
-    startTimerCountdown(); // 4. ЗАПУСКАЕМ ТАЙМЕР
-    
+    // Включаем SDK Телеграма
     if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
+    
+    // Сначала асинхронно стягиваем все файлы и данные из Облака, а они внутри себя запустят UI
+    loadDataFromCloud(); 
 });
