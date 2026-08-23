@@ -476,10 +476,10 @@
 
             AdController.show()
                 .then((result) => {
-                    gold += 500;
+                    diamonds += 1;
                     updateUI();
                     saveDataToCloud(); 
-                    alert("Спасибо за просмотр! Вам начислено 500 G");
+                    alert("Спасибо за просмотр! Вам начислено 1💎");
                 })
                 .catch((result) => {
                     console.error("Ad error:", result);
