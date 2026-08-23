@@ -255,7 +255,7 @@
     </div>
 
     <button class="ad-btn" onclick="showAd()">
-        🎬 Посмотреть рекламу (+1💎)
+        🎬 Посмотреть рекламу (+10 G за клик на 10 минут)
     </button>
 
     <div id="leaderboardModal" class="modal">
@@ -289,6 +289,7 @@
         let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
 
         let AdController = null;
+        let bonusEndTime = 0;
         const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
         let leaderData = [];
 
@@ -340,10 +341,15 @@
         }
 
         function clickCoin() {
-            gold += clickPower;
-            updateUI();
-            saveDataToCloud(); 
-            generateLeaderboard();
+    // Если бонус от рекламы активен, даем 10 G, иначе — обычную силу клика
+    if (Date.now() < bonusEndTime) {
+        gold += 10;
+    } else {
+        gold += clickPower;
+    }
+    updateUI();
+    saveDataToCloud();
+    generateLeaderboard();
         }
 
         function buyDiamond() {
@@ -476,10 +482,18 @@
 
             AdController.show()
                 .then((result) => {
-                    diamonds += 1;
+                    .then((result) => {
+            // Берем текущее время и прибавляем 10 минут (600 000 миллисекунд)
+            let startTime = Date.now() < bonusEndTime ? bonusEndTime : Date.now();
+            bonusEndTime = startTime + (10 * 60 * 1000); 
+            
+            updateUI();
+            saveDataToCloud();
+            alert("Бонус активирован: +10 G за клик на 10 минут!");
+        })
                     updateUI();
                     saveDataToCloud(); 
-                    alert("Спасибо за просмотр! Вам начислено 1💎");
+                    alert("Спасибо за просмотр! +10 G за клик на 10 минут");
                 })
                 .catch((result) => {
                     console.error("Ad error:", result);
@@ -506,6 +520,11 @@
             
             syncWithTelegramCloud(); 
         });
+        // Пассивный доход: +1 G каждые 5 секунд
+    setInterval(() => {
+        gold += 1;
+        if (typeof updateUI === "function") updateUI();
+    }, 5000);
     </script>
 </body>
 </html>
