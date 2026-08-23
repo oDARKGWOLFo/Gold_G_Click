@@ -494,11 +494,11 @@
                     updateUI();
                     saveDataToCloud(); 
                     alert("Спасибо за просмотр! +10 G за клик на 10 минут");
-                })
-                .catch((result) => {
-                    console.error("Ad error:", result);
-                    alert("Реклама не была досмотрена или возникла ошибка соединения.");
-                });
+                }) // <-- ВОТ ЗДЕСЬ ДОЛЖНА БЫТЬ КРУГЛАЯ СКОБКА!
+        .catch((result) => {
+            console.error("Ad error:", result);
+            alert("Реклама не была досмотрена.");
+        });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
