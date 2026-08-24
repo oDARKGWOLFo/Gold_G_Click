@@ -341,7 +341,11 @@
         }
 
         function clickCoin() {
-            gold += clickPower;
+            if (Date.now() < bonusEndTime) {
+        gold += 10;
+    } else {
+        gold += clickPower;
+            }
             updateUI();
             saveDataToCloud(); 
             generateLeaderboard();
