@@ -256,7 +256,7 @@
     </div>
 
     <button class="ad-btn" onclick="showAd()">
-        🎬 Посмотреть рекламу (+1💎)
+        🎬 Посмотреть рекламу (+10 G/клик на 10 мин)
     </button>
 
     <div id="leaderboardModal" class="modal">
@@ -526,10 +526,12 @@
             
             syncWithTelegramCloud(); 
         });
-        // Пассивный доход: +1 G каждые 10 секунд
+        // Пассивный доход: +1 G каждые 10 секунд с обновлением рейтинга в эфире
     setInterval(() => {
         gold += 1;
         if (typeof updateUI === "function") updateUI();
+        if (typeof saveDataToCloud === "function") saveDataToCloud();
+        if (typeof generateLeaderboard === "function") generateLeaderboard();
     }, 10000);
     </script>
 </body>
