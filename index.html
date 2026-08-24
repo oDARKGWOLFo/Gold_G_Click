@@ -280,6 +280,10 @@
                 Улучшение монеты:<br><b class="diamond-text">100 Алмазов 💎</b> ➡️ <b>+1 за клик навсегда</b>
                 <button class="action-btn" onclick="buyClickUpgrade()">Купить апгрейд</button>
             </div>
+            <div class="shop-item-box">
+                Пассивный доход (+1 G/10 сек):<br><b class="gold-cost">Цена: 100 💎</b>
+                <button class="action-btn" onclick="buyPassiveUpgrade()">Купить</button>
+            </div>
         </div>
     </div>
 
@@ -288,7 +292,7 @@
         let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
         let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
         let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
-
+let passiveIncome = parseInt(localStorage.getItem('clicker_passive_income')) || 1;
         let AdController = null;
         let bonusEndTime = 0;
         const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
@@ -307,6 +311,7 @@
             localStorage.setItem('clicker_diamonds', diamonds.toString());
             localStorage.setItem('clicker_power', clickPower.toString());
             localStorage.setItem('next_reset_time', nextResetTime.toString());
+            localStorage.setItem('clicker_passive_income', passiveIncome.toString());
             const timerEl = document.getElementById('ad-timer');
     if (timerEl) {
         let timeLeft = bonusEndTime - Date.now();
@@ -526,13 +531,27 @@
             
             syncWithTelegramCloud(); 
         });
-        // Пассивный доход: +1 G каждые 10 секунд с обновлением рейтинга в эфире
+        // Пассивный доход: капает значение passiveIncome каждые 10 секунд с обновлением в эфире
     setInterval(() => {
-        gold += 1;
+        gold += passiveIncome;
         if (typeof updateUI === "function") updateUI();
         if (typeof saveDataToCloud === "function") saveDataToCloud();
         if (typeof generateLeaderboard === "function") generateLeaderboard();
     }, 10000);
+
+    // Функция покупки пассивного дохода в магазине за 100 кристаллов
+    function buyPassiveUpgrade() {
+        if (diamonds >= 100) {
+            diamonds -= 100;
+            passiveIncome += 1;
+            
+            updateUI();
+            saveDataToCloud();
+            alert("Успешно куплено! Теперь пассивный доход приносит больше золота.");
+        } else {
+            alert("Недостаточно 💎! Смотрите рекламу, чтобы накопить 100 кристаллов.");
+        }
+    }
 
     // Обновление каждую 1 секунду для тиканья оранжевого таймера рекламы
     setInterval(() => {
