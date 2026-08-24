@@ -533,6 +533,12 @@
         if (typeof saveDataToCloud === "function") saveDataToCloud();
         if (typeof generateLeaderboard === "function") generateLeaderboard();
     }, 10000);
+
+    // Обновление каждую 1 секунду для тиканья оранжевого таймера рекламы
+    setInterval(() => {
+        if (typeof updateUI === "function") updateUI();
+    }, 1000);
+        
     </script>
 </body>
 </html>
