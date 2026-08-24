@@ -306,6 +306,19 @@
             localStorage.setItem('clicker_diamonds', diamonds.toString());
             localStorage.setItem('clicker_power', clickPower.toString());
             localStorage.setItem('next_reset_time', nextResetTime.toString());
+            const timerEl = document.getElementById('ad-timer');
+    if (timerEl) {
+        let timeLeft = bonusEndTime - Date.now();
+        if (timeLeft > 0) {
+            let minutes = Math.floor(timeLeft / 60000);
+            let seconds = Math.floor((timeLeft % 60000) / 1000);
+            if (seconds < 10) seconds = '0' + seconds;
+            timerEl.innerText = `Бонус x10: ${minutes}:${seconds}`;
+            timerEl.style.display = 'block';
+        } else {
+            timerEl.style.display = 'none';
+        }
+    }
         }
 
         function syncWithTelegramCloud() {
@@ -512,11 +525,11 @@
             
             syncWithTelegramCloud(); 
         });
-        // Пассивный доход: +1 G каждые 5 секунд
+        // Пассивный доход: +1 G каждые 10 секунд
     setInterval(() => {
         gold += 1;
         if (typeof updateUI === "function") updateUI();
-    }, 5000);
+    }, 1000);
     </script>
 </body>
 </html>
