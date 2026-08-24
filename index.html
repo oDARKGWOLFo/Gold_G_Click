@@ -506,6 +506,11 @@
             
             syncWithTelegramCloud(); 
         });
+        // Пассивный доход: +1 G каждые 5 секунд
+    setInterval(() => {
+        gold += 1;
+        if (typeof updateUI === "function") updateUI();
+    }, 5000);
     </script>
 </body>
 </html>
