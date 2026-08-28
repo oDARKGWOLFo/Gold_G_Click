@@ -3,561 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gold G Clicker</title>
+    <title>Gold_G_Click</title>
     
-    <!-- ПОДКЛЮЧЕНИЕ СИСТЕМ ADSGRAM И TELEGRAM WEB APP -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- ПОДКЛЮЧЕНИЕ SDK ТЕЛЕГРАМ И ADSGRAM -->
+    <script src="https://telegram.org"></script>
+    <script src="https://adsgram.ai"></script>
+
     <style>
+        /* ГЛОБАЛЬНЫЕ СТИЛИ (СТРОГО ПО СКРИНШОТУ) */
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #000000;
-            color: #FFFFFF;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #000000; /* Идеально черный фон как на скрине */
+            color: #ffffff;
             overflow: hidden;
-        }
-
-        /* Верхняя панель */
-        .top-bar {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-        .nav-btn {
-            background: transparent;
-            color: #FFD700;
-            border: 2px solid #FFD700;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .nav-btn:active {
-            background: rgba(255, 215, 0, 0.2);
-        }
-
-        /* Панель баланса по центру */
-        .balance-container {
-            border: 2px solid #FFD700;
-            border-radius: 12px;
-            padding: 10px 25px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.5);
-            min-width: 160px;
-        }
-        .balance-item {
-            font-size: 18px;
-            font-weight: bold;
-            color: #FFFFFF;
-            margin: 2px 0;
-        }
-        .gold-text { color: #FFD700; }
-        .diamond-text { color: #00E5FF; }
-        /* Зона клика */
-        .game-area {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            gap: 15px;
+            height: 100vh;
         }
-        .coin-btn {
-            background: transparent;
-            border: none;
-            border-radius: 50%;
-            width: 180px;
-            height: 180px;
+
+        /* КОНТЕЙНЕР ГЛАВНОГО МЕНЮ */
+        .main-menu-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            transition: transform 0.05s;
-        }
-        .coin-btn:active {
-            transform: scale(0.92);
-            outline: none;
-        }
-        .coin-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            flex-direction: column;
+            gap: 16px;
+            width: 85%;
+            max-width: 340px;
+            background: #000000;
+            border: 2px solid #ffca28; /* Тонкая желтая рамка вокруг меню */
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 0 20px rgba(255, 202, 40, 0.1);
         }
 
-        .info-text {
-            font-size: 14px;
-            font-weight: bold;
-            color: #00E5FF;
-            letter-spacing: 0.5px;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .timer-box {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px dashed #FFD700;
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 13px;
-            color: #FFD700;
-            margin-bottom: 12px;
-            font-weight: bold;
-        }
-
-        /* Кнопка рекламы */
-        .ad-btn {
-            width: 100%;
-            max-width: 350px;
-            background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%);
-            color: #000000;
-            border: none;
+        /* КНОПКИ ГЛАВНОГО МЕНЮ */
+        .menu-btn {
+            background: none;
+            border: 1.5px solid #ffca28; /* Желтая рамка для каждой кнопки */
+            color: #ffca28; /* Желтый текст */
             border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
+            padding: 15px;
+            font-size: 1.05rem;
             font-weight: bold;
-            display: flex;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s ease, color 0.15s ease;
+            width: 100%;
+        }
+        .menu-btn:active {
+            background: #ffca28;
+            color: #000000;
+        }
+
+        /* СТИЛИ ДЛЯ ЭКРАНОВ РАЗДЕЛОВ */
+        .screen-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000000;
+            z-index: 1000;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+        }
+        .screen-content {
+            width: 85%;
+            max-width: 340px;
+            background: #000000;
+            border: 2px solid #ffca28; /* Желтая рамка раздела */
+            border-radius: 20px;
+            padding: 25px 20px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .back-to-menu-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 1.4rem;
+            color: #ffca28;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+            font-weight: bold;
+            line-height: 1;
+        }
+        .screen-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ffca28;
+        }
+
+        /* ПАНЕЛЬ БАЛАНСОВ НА ЭКРАНЕ КЛИКА */
+        .click-balance-display {
+            background: #000000;
+            border: 1px solid #ffca28; /* Тонкая рамка в стиле скриншота */
+            border-radius: 14px;
+            width: 100%;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .gold-row { color: #ffffff; font-size: 1.25rem; margin-bottom: 4px; }
+        .diam-row { color: #a855f7; font-size: 1.05rem; }
+
+        /* КРУГЛАЯ МОНЕТА ДЛЯ ТАПОВ */
+        .coin-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 10px;
         }
-        .ad-btn:active {
-            transform: scale(0.98);
-            opacity: 0.9;
+        .round-coin-btn {
+            background: none; border: none; outline: none;
+            cursor: pointer;
+            transition: transform 0.05s ease;
+        }
+        .round-coin-btn:active { transform: scale(0.95); }
+        .coin-img {
+            width: 190px; height: 190px;
+            filter: drop-shadow(0 0 15px rgba(255, 202, 40, 0.15));
         }
 
-        /* Модальные окна */
+        /* КАРТОЧКИ ВНУТРИ МАГАЗИНА И ТОП-100 */
+        .item-card {
+            background: #000000;
+            border: 1px solid #3a3018; /* Темно-золотой внутренний контур */
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+        .item-card-btn {
+            background: none;
+            border: 1.5px solid #ffca28;
+            color: #ffca28;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.1s ease;
+        }
+        .item-card-btn:active { background: #ffca28; color: #000000; }
+
+        /* СТРОКИ ДЛЯ ЛИДЕРБОРДА */
+        .leader-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 8px;
+            border-bottom: 1px solid #1c180e;
+            font-size: 0.9rem;
+        }
+        .ldr-pos { font-weight: bold; color: #ffca28; width: 35px; }
+        .ldr-name { flex: 1; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ldr-prize { font-weight: bold; color: #00e5ff; }
+
+        /* ОКНО ПОДТВЕРЖДЕНИЯ (CONFIRM) */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 100;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1100;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-        .modal-content {
-            background: #111111;
-            border: 2px solid #FFD700;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 320px;
-            padding: 20px;
-            text-align: center;
-            position: relative;
+        .confirm-box { text-align: center; padding: 5px; }
+        .confirm-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 22px; line-height: 1.4; }
+        .confirm-buttons-row { display: flex; gap: 15px; justify-content: center; }
+        .confirm-choice-btn {
+            background: none; border: 1.5px solid #ffffff; color: white;
+            padding: 9px 18px; border-radius: 10px; font-weight: bold; font-size: 0.88rem;
+            cursor: pointer; min-width: 105px;
         }
-        .modal-title {
-            color: #FFD700;
-            font-size: 20px;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: #FFD700;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        .leaderboard-list {
-            max-height: 250px;
-            overflow-y: auto;
-            text-align: left;
-            margin-bottom: 10px;
-        }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 5px;
-            border-bottom: 1px solid #222;
-            font-size: 14px;
-            align-items: center;
-        }
-        .my-row {
-            background: rgba(255, 215, 0, 0.15);
-            font-weight: bold;
-            color: #FFD700;
-        }
-        
-        .shop-item-box {
-            background: #1a1a1a;
-            border: 1px solid #FFD700;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 15px;
-        }
-        .action-btn {
-            background: transparent;
-            color: #FFD700;
-            border: 2px solid #FFD700;
-            border-radius: 8px;
-            padding: 8px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .action-btn:active {
-            background: rgba(255, 215, 0, 0.2);
-        }
+        .confirm-choice-btn.yes { border-color: #ffca28; color: #ffca28; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <button class="nav-btn" onclick="openModal('leaderboardModal')">🏆 ТОП 100</button>
-        <div class="balance-container">
-            <div class="balance-item"><span id="goldBalance">0</span> <span class="gold-text">G</span></div>
-            <div class="balance-item"><span id="diamondBalance">0</span> <span class="diamond-text">💎</span></div>
+    <!-- ==================================================== -->
+    <!-- ГЛАВНОЕ МЕНЮ ИГРЫ (ОТКРЫВАЕТСЯ ПРИ ВХОДЕ)           -->
+    <!-- ==================================================== -->
+    <div id="mainMenuScreen" class="main-menu-container">
+        <!-- Заголовок Главная сверху -->
+        <div style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffca28; position: relative;">
+            Главная
+            <span style="position: absolute; right: 0; top: -2px; font-size: 1.3rem; color: #3a3018; cursor: pointer;" onclick="tg?.close();">&times;</span>
         </div>
-        <button class="nav-btn" onclick="openModal('shopModal')">🏪 Магазин</button>
-    </div>
-    <div id="ad-timer" style="display: none; text-align: center; font-size: 1.2rem; color: #ff9900; margin: 10px 0; font-weight: bold; text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);">Бонус x10: 10:00</div>
-
-    <div class="game-area">
-        <button class="coin-btn" onclick="clickCoin()">
-            <svg class="coin-img" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="#FFD700" stroke="#B8860B" stroke-width="4"/>
-                <circle cx="50" cy="50" r="37" fill="#FFD700" stroke="#DAA520" stroke-width="2" stroke-dasharray="4"/>
-                <text x="50" y="58" font-size="26" font-weight="bold" fill="#B8860B" text-anchor="middle">G</text>
-            </svg>
-        </button>
-        <div id="click-power-display" class="info-text">КЛИК: +1 G</div>
-    </div>
-
-    <button class="ad-btn" onclick="showAd()">
-        🎬 Посмотреть рекламу (+10 G/клик на 10 мин)
-    </button>
-
-    <div id="leaderboardModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('leaderboardModal')">&times;</span>
-            <div class="modal-title">Топ 100 игроков</div>
-            <div id="seasonTimer" class="timer-box">До обнуления: --д --ч --м --с</div>
-            <div class="leaderboard-list" id="leaderboardList"></div>
-        </div>
-    </div>
-
-    <div id="shopModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('shopModal')">&times;</span>
-            <div class="modal-title">Магазин</div>
-            <div class="shop-item-box">
-                Обмен валюты:<br><b class="gold-text">10 000 G</b> ➡️ <b class="diamond-text">1 Алмаз 💎</b>
-                <button class="action-btn" onclick="buyDiamond()">Обменять</button>
-            </div>
-            <div class="shop-item-box">
-                Улучшение монеты:<br><b class="diamond-text">100 Алмазов 💎</b> ➡️ <b>+1 за клик навсегда</b>
-                <button class="action-btn" onclick="buyClickUpgrade()">Купить апгрейд</button>
-            </div>
-            <div class="shop-item-box">
-                Пассивный доход (+1 G/10 сек):<br><b class="gold-cost">Цена: 100 💎</b>
-                <button class="action-btn" onclick="buyPassiveUpgrade()">Купить</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let gold = parseInt(localStorage.getItem('clicker_gold')) || 0;
-        let diamonds = parseInt(localStorage.getItem('clicker_diamonds')) || 0;
-        let clickPower = parseInt(localStorage.getItem('clicker_power')) || 1;
-        let nextResetTime = parseInt(localStorage.getItem('next_reset_time')) || 0;
-let passiveIncome = parseInt(localStorage.getItem('clicker_passive_income')) || 1;
-        let AdController = null;
-        let bonusEndTime = 0;
-        const botNames = ["Ivan_Pro", "CryptoKing", "MiniApp_Dev", "Shadow", "Alex777", "Luna", "ClickMaster", "Digger", "CyberUser", "Phoenix"];
-        let leaderData = [];
-
-        function updateUI() {
-            const goldEl = document.getElementById('goldBalance');
-            const diamondEl = document.getElementById('diamondBalance');
-            const powerEl = document.getElementById('click-power-display');
-
-            if (goldEl) goldEl.innerText = gold;
-            if (diamondEl) diamondEl.innerText = diamonds;
-            if (powerEl) powerEl.innerText = `КЛИК: +${clickPower} G`;
-            
-            localStorage.setItem('clicker_gold', gold.toString());
-            localStorage.setItem('clicker_diamonds', diamonds.toString());
-            localStorage.setItem('clicker_power', clickPower.toString());
-            localStorage.setItem('next_reset_time', nextResetTime.toString());
-            localStorage.setItem('clicker_passive_income', passiveIncome.toString());
-            const timerEl = document.getElementById('ad-timer');
-    if (timerEl) {
-        let timeLeft = bonusEndTime - Date.now();
-        if (timeLeft > 0) {
-            let minutes = Math.floor(timeLeft / 60000);
-            let seconds = Math.floor((timeLeft % 60000) / 1000);
-            if (seconds < 10) seconds = '0' + seconds;
-            timerEl.innerText = `Бонус x10: ${minutes}:${seconds}`;
-            timerEl.style.display = 'block';
-        } else {
-            timerEl.style.display = 'none';
-        }
-    }
-        }
-
-        function syncWithTelegramCloud() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
-                window.Telegram.WebApp.CloudStorage.getItems(['cloud_gold', 'cloud_diamonds', 'cloud_power', 'cloud_reset_time'], (err, values) => {
-                    if (!err && values) {
-                        let cloudGold = parseInt(values.cloud_gold) || 0;
-                        let cloudDiamonds = parseInt(values.cloud_diamonds) || 0;
-                        let cloudPower = parseInt(values.cloud_power) || 1;
-                        let cloudResetTime = parseInt(values.cloud_reset_time) || 0;
-
-                        if (cloudGold > gold) gold = cloudGold;
-                        if (cloudDiamonds > diamonds) diamonds = cloudDiamonds;
-                        if (cloudPower > clickPower) clickPower = cloudPower;
-                        if (cloudResetTime > nextResetTime && cloudResetTime !== 0) nextResetTime = cloudResetTime;
-
-                        checkSeasonStatus();
-                        updateUI();
-                        generateLeaderboard();
-                    }
-                });
-            }
-        }
-
-        function saveDataToCloud() {
-            updateUI();
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.CloudStorage) {
-                window.Telegram.WebApp.CloudStorage.setItem('cloud_gold', gold.toString());
-                window.Telegram.WebApp.CloudStorage.setItem('cloud_diamonds', diamonds.toString());
-                window.Telegram.WebApp.CloudStorage.setItem('cloud_power', clickPower.toString());
-                window.Telegram.WebApp.CloudStorage.setItem('cloud_reset_time', nextResetTime.toString());
-            }
-        }
-
-        function clickCoin() {
-            if (Date.now() < bonusEndTime) {
-        gold += 10;
-    } else {
-        gold += clickPower;
-            }
-            updateUI();
-            saveDataToCloud(); 
-            generateLeaderboard();
-        }
-
-        function buyDiamond() {
-            if (gold >= 10000) {
-                gold -= 10000;
-                diamonds += 1;
-                saveDataToCloud();
-                generateLeaderboard();
-                alert("Успешный обмен! Вы получили 1 алмаз 💎");
-            } else {
-                alert("Недостаточно золота (G) для обмена! Требуется 10 000 G.");
-            }
-        }
-
-        function buyClickUpgrade() {
-            if (diamonds >= 100) {
-                diamonds -= 100;
-                clickPower += 1;
-                saveDataToCloud();
-                alert(`Улучшение куплено! Теперь каждый клик приносит +${clickPower} G 🚀`);
-            } else {
-                alert("Недостаточно алмазов 💎 для покупки апгрейда!");
-            }
-        }
-
-        function openModal(id) {
-            document.getElementById(id).style.display = 'flex';
-        }
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        function checkSeasonStatus() {
-            const now = Date.now();
-            if (nextResetTime === 0) {
-                nextResetTime = now + (7 * 24 * 60 * 60 * 1000);
-                saveDataToCloud();
-            }
-            if (now >= nextResetTime) {
-                generateLeaderboard();
-                const myRankIndex = leaderData.findIndex(player => player.isMe);
-                const myRankPosition = myRankIndex + 1; 
-                
-                let rewardDiamonds = 0;
-                if (myRankPosition === 1) rewardDiamonds = 100;
-                else if (myRankPosition === 2) rewardDiamonds = 50;
-                else if (myRankPosition === 3) rewardDiamonds = 10;
-
-                if (rewardDiamonds > 0) {
-                    diamonds += rewardDiamonds;
-                    alert(`Сезон окончен! Вы заняли ${myRankPosition} место и выиграли ${rewardDiamonds} 💎!`);
-                } else {
-                    alert(`Сезон окончен! Вы заняли ${myRankPosition} место. Попробуйте на следующей неделе!`);
-                }
-
-                gold = 0; 
-                nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
-                saveDataToCloud();
-            }
-                }
-        function startTimerCountdown() {
-            setInterval(() => {
-                const timerEl = document.getElementById('seasonTimer');
-                if (!timerEl) return;
-                
-                const now = Date.now();
-                const timeLeft = nextResetTime - now;
-                
-                if (timeLeft <= 0) {
-                    checkSeasonStatus();
-                    return;
-                }
-                
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                
-                timerEl.innerText = `До обнуления: ${days}д ${hours}ч ${minutes}м ${seconds}с`;
-            }, 1000);
-        }
-
-        function generateLeaderboard() {
-            leaderData = [];
-            let telegramName = "Вы (Выбранный профиль)";
-            
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
-                telegramName = user.first_name + (user.last_name ? " " + user.last_name : "");
-            }
-            
-            leaderData.push({ name: telegramName, score: gold, isMe: true });
-            
-            for (let i = 1; i <= 99; i++) {
-                let botIndex = i % botNames.length;
-                let botScore = 8000 - (i * 80) + (i % 3 === 0 ? 30 : -20); 
-                if (botScore < 0) botScore = 0;
-                leaderData.push({ name: `${botNames[botIndex]}_${i}`, score: botScore, isMe: false });
-            }
-
-            leaderData.sort((a, b) => b.score - a.score);
-
-            const listEl = document.getElementById('leaderboardList');
-            if (listEl) {
-                listEl.innerHTML = '';
-                leaderData.forEach((player, index) => {
-                    const position = index + 1;
-                    let badge = `${position}. `; 
-                    
-                    if (position === 1) badge = "100💎 🏆 ";
-                    if (position === 2) badge = "50💎 🥈 ";
-                    if (position === 3) badge = "10💎 🥉 ";
-
-                    const item = document.createElement('div');
-                    item.className = 'leaderboard-item' + (player.isMe ? ' my-row' : '');
-                    item.innerHTML = `<span>${badge}${player.name}</span><span>${player.score} G</span>`;
-                    listEl.appendChild(item);
-                });
-            }
-        }
-
-        function showAd() {
-            if (!AdController) {
-               // alert("Режим отладки: Рекламный блок настраивается. Начислено +500 G");
-               // gold += 500;
-                //updateUI();
-                //saveDataToCloud();
-                //return;
-            }
-
-            AdController.show()
-                .then((result) => {
-                    let startTime = Date.now() < bonusEndTime ? bonusEndTime : Date.now();
-            bonusEndTime = startTime + (10 * 60 * 1000);
-            updateUI();
-            saveDataToCloud();
-            alert("Бонус активирован! +10 G за клик на 10 минут!");
-                })
-                .catch((result) => {
-                    console.error("Ad error:", result);
-                    alert("Реклама не была досмотрена или возникла ошибка соединения.");
-                });
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            updateUI();            
-            checkSeasonStatus();   
-            generateLeaderboard(); 
-            startTimerCountdown(); 
-            
-            // СИНТАКСИС ПОДКЛЮЧЕНИЯ ИЗ ВАШЕЙ ВТОРОЙ ИГРЫ
-            // ЗАМЕНИТЕ "43566" НА ВАШ НОВЫЙ ID БЛОКА ИЗ ADSGRAM
-            if (window.Adsgram && window.Adsgram.init) {
-    AdController = window.Adsgram.init({ blockId: "44391" }); 
-            }
-            
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-            }
-            
-            syncWithTelegramCloud(); 
-        });
-        // Пассивный доход: капает значение passiveIncome каждые 10 секунд с обновлением в эфире
-    setInterval(() => {
-        gold += passiveIncome;
-        if (typeof updateUI === "function") updateUI();
-        if (typeof saveDataToCloud === "function") saveDataToCloud();
-        if (typeof generateLeaderboard === "function") generateLeaderboard();
-    }, 10000);
-
-    // Функция покупки пассивного дохода в магазине за 100 кристаллов
-    function buyPassiveUpgrade() {
-        if (diamonds >= 100) {
-            diamonds -= 100;
-            passiveIncome += 1;
-            
-            updateUI();
-            saveDataToCloud();
-            alert("Успешно куплено! Теперь пассивный доход приносит больше золота.");
-        } else {
-            alert("Недостаточно 💎! Смотрите рекламу, чтобы накопить 100 кристаллов.");
-        }
-    }
-
-    // Обновление каждую 1 секунду для тиканья оранжевого таймера рекламы
-    setInterval(() => {
-        if (typeof updateUI === "function") updateUI();
-    }, 1000);
         
+        <!-- Три основные кнопки выбора -->
+        <button class="menu-btn" onclick="NavModule.showScreen('playScreen')">Играть</button>
+        <button class="menu-btn" onclick="NavModule.showScreen('leaderboardScreen')">Топ 100 игроков</button>
+        <button class="menu-btn" onclick="NavModule.showScreen('shopScreen')">Магазин</button>
+    </div>
+
+
+    <!-- ==================================================== -->
+    <!-- РАЗДЕЛ 1: ЭКРАН «ИГРАТЬ» (ЧИСТЫЙ КЛИКЕР)            -->
+    <!-- ==================================================== -->
+    <div id="playScreen" class="screen-overlay">
+        <div class="screen-content">
+            <!-- Кнопка выхода в главное меню -->
+            <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
+            <div class="screen-title">Главная</div>
+            
+            <!-- Информационная панель двух балансов -->
+            <div class="click-balance-display">
+                <div class="gold-row">🪙 <span id="gameGoldBal">0</span> G</div>
+                <div class="diam-row">💎 <span id="gameDiamBal">0</span></div>
+            </div>
+
+            <!-- Круглая монета для бесконечных тапов -->
+            <div class="coin-box">
+                <button class="round-coin-btn" onclick="AppLogic.tapCoin()">
+                    <svg class="coin-img" viewBox="0 0 100 100" xmlns="http://w3.org">
+                        <circle cx="50" cy="50" r="46" fill="#000000" stroke="#ffca28" stroke-width="2"/>
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3 3"/>
+                        <text x="50" y="58" font-family="inherit" font-size="24" font-weight="bold" fill="#ffca28" text-anchor="middle">G</text>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================================================== -->
+    <!-- РАЗДЕЛ 2: ЭКРАН «ТОП 100 ИГРОКОВ»                   -->
+    <!-- ==================================================== -->
+    <div id="leaderboardScreen" class="screen-overlay">
+        <div class="screen-content">
+            <!-- Кнопка выхода в главное меню -->
+            <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
+            <div class="screen-title">Топ 100 игроков</div>
+            
+            <!-- Индикатор общего фонда от рекламы -->
+            <div style="font-size: 1.05rem; color: #ffca28; font-weight: bold; margin-bottom: 5px; text-align: center;">
+                💰 Общий фонд: <span id="prizePoolTxt">1684</span> 💎
+            </div>
+            <div id="seasonTimerDisplay" style="text-align: center; font-size: 0.8rem; color: #8986a3; margin-bottom: 15px;">До обнуления: --</div>
+            
+            <!-- Динамические строки лидерборда -->
+            <div id="htmlLeaderboardRows"></div>
+        </div>
+    </div>
+
+
+    <!-- ==================================================== -->
+    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН»                           -->
+    <!-- ==================================================== -->
+    <div id="shopScreen" class="screen-overlay">
+        <div class="screen-content">
+            <!-- Кнопка выхода в главное меню -->
+            <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
+            <div class="screen-title">Магазин</div>
+            
+            <!-- Обмен алмазов на золото -->
+            <div class="item-card">
+                <div style="font-size: 0.95rem; font-weight: bold;">Обмен валюты:<br><span style="color: #ffca28;">1 Алмаз 💎 ➡️ 10 000 G</span></div>
+                <button class="item-card-btn" onclick="AppLogic.exchangeDiamondForGold()">Обменять</button>
+            </div>
+
+            <!-- Прокачка силы клика -->
+            <div class="item-card">
+                <div style="font-size: 0.95rem; font-weight: bold;">Улучшение монеты:<br>Цена: <span id="lvlUpCostTxt" style="color: #ffca28;">1000</span> G</div>
+                <div style="font-size: 0.8rem; color: #8986a3;">Текущая сила: +<span id="lvlUpPowerTxt">1</span> за клик</div>
+                <button class="item-card-btn" onclick="AppLogic.upgradeClickPower()">Купить апгрейд</button>
+            </div>
+
+            <!-- Рекламный бонус на алмаз с окном подтверждения -->
+            <div class="item-card">
+                <div style="font-size: 0.95rem; font-weight: bold; color: #ff4a4a;">🎬 Рекламный бонус</div>
+                <div style="font-size: 0.8rem; color: #8986a3;">Посмотрите ролик AdsGram, чтобы забрать <span style="color: #ffca28;">+1 Алмаз 💎</span></div>
+                <button class="item-card-btn" style="border-color: #ff4a4a; color: #ff4a4a;" onclick="AppLogic.openConfirmModal()">Забрать бонус</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ВССПЛЫВАЮЩЕЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЕЙСТВИЯ (CONFIRM) -->
+    <div id="confirmActionModal" class="modal">
+        <div class="modal-content" style="max-width: 320px; border-color: #ffca28;">
+            <div class="modal-title" style="color: #ffca28; font-size: 1.1rem;">Подтвердить действие?</div>
+            <div class="confirm-box">
+                <div class="confirm-text">Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислен 1 Алмаз 💎.</div>
+                <div class="confirm-buttons-row">
+                    <button class="confirm-choice-btn" onclick="AppLogic.closeConfirmModal(false)">ОТМЕНИТЬ</button>
+                    <button class="confirm-choice-btn yes" onclick="AppLogic.closeConfirmModal(true)">ПОДТВЕРДИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ====================================================
+        // 1. ХРАНИЛИЩЕ ДАННЫХ И СИНХРОНИЗАЦИЯ С ПАМЯТЬЮ
+        // ====================================================
+        const GameStore = {
+            gold: parseInt(localStorage.getItem('g_click_gold')) || 0,
+            diamonds: parseInt(localStorage.getItem('g_click_diamonds')) || 0,
+            clickPower: parseInt(localStorage.getItem('g_click_pwr')) || 1,
+            clickUpgradeCost: parseInt(localStorage.getItem('g_click_cst')) || 1000,
+            
+            // Базовый стартовый фонд по твоей 3Х-модели
+            totalPrizePool: parseFloat(localStorage.getItem('g_prize_pool')) || 1684,
+            nextResetTime: parseInt(localStorage.getItem('g_next_reset')) || 0,
+            localLeaderboardList: []
+        };
+
+        // Инициализация Telegram SDK
+        const tg = window.Telegram?.WebApp;
+        if (tg) tg.expand();
+
+        function syncAndRefreshUI() {
+            document.getElementById('gameGoldBal').innerText = Math.floor(GameStore.gold);
+            document.getElementById('gameDiamBal').innerText = GameStore.diamonds;
+            
+            if(document.getElementById('lvlUpCostTxt')) document.getElementById('lvlUpCostTxt').innerText = GameStore.clickUpgradeCost;
+            if(document.getElementById('lvlUpPowerTxt')) document.getElementById('lvlUpPowerTxt').innerText = GameStore.clickPower;
+            if(document.getElementById('prizePoolTxt')) document.getElementById('prizePoolTxt').innerText = Math.floor(GameStore.totalPrizePool);
+
+            // Запись данных в память устройства
+            localStorage.setItem('g_click_gold', GameStore.gold.toString());
+            localStorage.setItem('g_click_diamonds', GameStore.diamonds.toString());
+            localStorage.setItem('g_click_pwr', GameStore.clickPower.toString());
+            localStorage.setItem('g_click_cst', GameStore.clickUpgradeCost.toString());
+            localStorage.setItem('g_prize_pool', GameStore.totalPrizePool.toString());
+            localStorage.setItem('g_next_reset', GameStore.nextResetTime.toString());
+        }
+
+        // ====================================================
+        // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
+        // ====================================================
+        const NavModule = {
+            showScreen: function(screenId) {
+                // Прячем главное меню и все оверлеи
+                document.getElementById('mainMenuScreen').style.display = 'none';
+                document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
+                
+                // Включаем выбранный экран
+                document.getElementById(screenId).style.display = 'flex';
+                
+                // При открытии ТОП 100 обновляем позиции
+                if (screenId === 'leaderboardScreen') {
+                    LeaderboardModule.refreshLeaderboard();
+                }
+            },
+            backToMenu: function() {
+                // Закрываем разделы и выводим Главное меню на экран
+                document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
+                document.getElementById('mainMenuScreen').style.display = 'flex';
+            }
+        };
+
+        // ====================================================
+        // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, ОБМЕН, АПГРЕЙДЫ И CONFIRM)
+        // ====================================================
+        const AppLogic = {
+            tapCoin: function() {
+                // Бесконечный клик по монете
+                GameStore.gold += GameStore.clickPower;
+                syncAndRefreshUI();
+                LeaderboardModule.refreshLeaderboard();
+            },
+
+            exchangeDiamondForGold: function() {
+                if (GameStore.diamonds >= 1) {
+                    GameStore.diamonds -= 1;
+                    GameStore.gold += 10000;
+                    syncAndRefreshUI();
+                    LeaderboardModule.refreshLeaderboard();
+                    alert("🔄 Успешно! 1 Алмаз обменился на 10 000 G.");
+                } else {
+                    alert("❌ Недостаточно алмазов 💎 для обмена!");
+                }
+            },
+
+            upgradeClickPower: function() {
+                if (GameStore.gold >= GameStore.clickUpgradeCost) {
+                    GameStore.gold -= GameStore.clickUpgradeCost;
+                    GameStore.clickPower += 1;
+                    // Экспоненциальное удорожание, чтобы сжигать монеты G
+                    GameStore.clickUpgradeCost = Math.round(GameStore.clickUpgradeCost * 2.5);
+                    syncAndRefreshUI();
+                    alert(`💪 Улучшение куплено! Теперь за клик: +${GameStore.clickPower} G!`);
+                } else {
+                    alert("❌ Недостаточно золота G для покупки апгрейда!");
+                }
+            },
+
+            openConfirmModal: function() {
+                document.getElementById('confirmActionModal').style.display = 'flex';
+            },
+
+            closeConfirmModal: function(isConfirmed) {
+                document.getElementById('confirmActionModal').style.display = 'none';
+                if (isConfirmed) {
+                    this.executeAdsGramCall();
+                }
+            },
+
+            executeAdsGramCall: function() {
+                const AdController = window.AdsGram?.createAdListener({ blockId: "44331" });
+                
+                if (AdController) {
+                    AdController.show()
+                        .then((result) => {
+                            GameStore.diamonds += 1;
+                            GameStore.totalPrizePool += 1; // Растет весь фонд одновременно
+                            
+                            syncAndRefreshUI();
+                            LeaderboardModule.renderHTML();
+                            alert("🎉 Успешно! Вам начислен +1 Алмаз 💎. Общий фонд турнира увеличен!");
+                        })
+                        .catch((err) => {
+                            alert("Реклама не загрузилась. Попробуйте еще раз позже.");
+                        });
+                } else {
+                    // Тест в браузере
+                    GameStore.diamonds += 1;
+                    GameStore.totalPrizePool += 1;
+                    syncAndRefreshUI();
+                    LeaderboardModule.renderHTML();
+                    alert("📺 Тест: Реклама просмотрена! Получен +1 💎");
+                }
+            }
+        };
+        // ====================================================
+        // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
+        // ====================================================
+        const LeaderboardModule = {
+            refreshLeaderboard: function() {
+                // Если таблица пустая — генерируем 99 ботов для создания конкуренции
+                if (GameStore.localLeaderboardList.length === 0) {
+                    for (let i = 1; i <= 99; i++) {
+                        GameStore.localLeaderboardList.push({
+                            id: i,
+                            name: `User_Click_${Math.floor(Math.random() * 9000 + 1000)}`,
+                            gold: Math.floor(48000 - (i * 450)),
+                            isMe: false
+                        });
+                    }
+                }
+
+                // Добавляем или обновляем текущую позицию реального игрока
+                const myProfile = { 
+                    id: "me", 
+                    name: tg?.initDataUnsafe?.user?.first_name || "Вы (Игрок)", 
+                    gold: GameStore.gold, 
+                    isMe: true 
+                };
+                
+                const myOldIndex = GameStore.localLeaderboardList.findIndex(p => p.isMe);
+                if (myOldIndex !== -1) GameStore.localLeaderboardList.splice(myOldIndex, 1);
+                
+                GameStore.localLeaderboardList.push(myProfile);
+                // Сортируем строго по золоту сверху вниз
+                GameStore.localLeaderboardList.sort((a, b) => b.gold - a.gold);
+                
+                this.renderHTML();
+            },
+
+            renderHTML: function() {
+                const targetList = document.getElementById('htmlLeaderboardRows');
+                if (!targetList) return;
+                targetList.innerHTML = "";
+
+                // Срез строго первой сотни участников таблицы
+                const activeTop100 = GameStore.localLeaderboardList.slice(0, 100);
+
+                activeTop100.forEach((player, idx) => {
+                    const pos = idx + 1;
+                    let calculatedReward = 0;
+
+                    // Умное процентное деление общего фонда (защита от перевернутых наград)
+                    if (pos === 1) calculatedReward = Math.round(GameStore.totalPrizePool * 0.25);
+                    else if (pos === 2) calculatedReward = Math.round(GameStore.totalPrizePool * 0.15);
+                    else if (pos === 3) calculatedReward = Math.round(GameStore.totalPrizePool * 0.10);
+                    else if (pos >= 4 && pos <= 10) calculatedReward = Math.round((GameStore.totalPrizePool * 0.14) / 7);
+                    else if (pos >= 11 && pos <= 30) calculatedReward = Math.round((GameStore.totalPrizePool * 0.20) / 20);
+                    else if (pos >= 31 && pos <= 60) calculatedReward = Math.round((GameStore.totalPrizePool * 0.12) / 30);
+                    else if (pos >= 61 && pos <= 100) calculatedReward = Math.round((GameStore.totalPrizePool * 0.04) / 40);
+
+                    if (calculatedReward < 1) calculatedReward = 1; // Защита от нуля
+
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = `leader-row ${player.isMe ? 'me' : ''}`;
+                    rowDiv.innerHTML = `
+                        <span class="ldr-pos">${pos}</span>
+                        <span class="ldr-name">${player.name}</span>
+                        <span class="ldr-prize">${calculatedReward} 💎</span>
+                    `;
+                    targetList.appendChild(rowDiv);
+                });
+            },
+
+            initTimer: function() {
+                if (!GameStore.nextResetTime) {
+                    GameStore.nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000); // Сезон равен 7 дням
+                }
+
+                setInterval(() => {
+                    const tDiff = GameStore.nextResetTime - Date.now();
+                    if (tDiff <= 0) {
+                        alert("⏱ Сезон завершен! Балансы золота G сброшены, новый раунд турнира начался.");
+                        GameStore.gold = 0;
+                        GameStore.totalPrizePool = 1684;
+                        GameStore.nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+                        syncAndRefreshUI();
+                        this.refreshLeaderboard();
+                        return;
+                    }
+                    const d = Math.floor(tDiff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((tDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((tDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((tDiff % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('seasonTimerDisplay').innerText = `До обнуления: ${d}д ${h}ч ${m}м ${s}с`;
+                }, 1000);
+            }
+        };
+
+        // ====================================================
+        // 5. ЗАПУСК ИГРОВОГО ЯДРА ДЛЯ СТАРТА ПРИ ЗАГРУЗКЕ
+        // ====================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            syncAndRefreshUI();
+            LeaderboardModule.refreshLeaderboard();
+            LeaderboardModule.initTimer();
+        });
     </script>
 </body>
 </html>
