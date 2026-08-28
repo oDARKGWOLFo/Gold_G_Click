@@ -474,7 +474,13 @@
                     rowDiv.className = `leader-row ${player.isMe ? 'me' : ''}`;
                     rowDiv.innerHTML = `
                         <span class="ldr-pos">${pos}</span>
-                        <span class="ldr-name" style="flex: 1.2;">${player.name}</span>
+                        <span class="ldr-name" style="
+                            flex: 1.8; 
+                            font-size: 0.88rem;
+                            white-space: nowrap; 
+                            overflow: visible; 
+                            ${player.isMe ? 'color: #ffca28; font-weight: bold; text-shadow: 0 0 5px rgba(255, 202, 40, 0.4);' : 'color: #ffffff;'}
+                        ">${player.name}</span>
                         <span style="flex: 1; color: #ffca28; font-size: 0.85rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 5px;">🪙 ${Math.floor(player.gold).toLocaleString()}</span>
                         <span class="ldr-prize" style="flex: 0.8; text-align: right; white-space: nowrap;">${calculatedReward} 💎</span>
                     `;
