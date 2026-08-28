@@ -8,6 +8,7 @@
     <!-- ПОДКЛЮЧЕНИЕ SDK ТЕЛЕГРАМ И ADSGRAM -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.live/js/sad.min.js"></script>
+
     <style>
         /* ГЛОБАЛЬНЫЕ СТИЛИ (СТРОГО ПО СКРИНШОТУ) */
         * {
@@ -104,7 +105,7 @@
         /* ПАНЕЛЬ БАЛАНСОВ НА ЭКРАНЕ КЛИКА */
         .click-balance-display {
             background: #000000;
-            border: 1px solid #ffca28; /* Переведено на ярко-золотую рамку */
+            border: 1px solid #ffca28; /* Ярко-золотая рамка */
             border-radius: 14px;
             width: 100%;
             padding: 14px;
@@ -117,8 +118,7 @@
         }
         .gold-row { color: #ffffff; font-size: 1.25rem; margin-bottom: 4px; }
         .diam-row { color: #a855f7; font-size: 1.05rem; }
-
-        /* КРУГЛАЯ МОНЕТА ДЛЯ ТАПОВ */
+/* КРУГЛАЯ МОНЕТА ДЛЯ ТАПОВ */
         .coin-box {
             display: flex;
             justify-content: center;
@@ -139,7 +139,7 @@
         /* КАРТОЧКА ВНУТРИ МАГАЗИНА */
         .item-card {
             background: #000000;
-            border: 1px solid #ffca28; /* Переведено на ярко-золотую внутреннюю рамку */
+            border: 1px solid #ffca28; /* Ярко-золотая внутренняя рамка */
             border-radius: 14px;
             padding: 16px;
             margin-bottom: 15px;
@@ -148,6 +148,7 @@
             align-items: center;
             text-align: center;
             gap: 10px;
+            width: 100%;
         }
         .item-card-btn {
             background: none;
@@ -169,7 +170,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 8px;
-            border-bottom: 1px solid rgba(255, 202, 40, 0.2); /* Тонкая ярко-золотая полоска разделения */
+            border-bottom: 1px solid rgba(255, 202, 40, 0.2); /* Тонкая ярко-золотая полоска */
             font-size: 0.9rem;
         }
         .ldr-pos { font-weight: bold; color: #ffca28; width: 35px; }
@@ -195,6 +196,26 @@
             cursor: pointer; min-width: 105px;
         }
         .confirm-choice-btn.yes { border-color: #ffca28; color: #ffca28; }
+
+        /* АНИМАЦИЯ ПЛАВНОГО МИГАНИЯ ЗОЛОТОМ (ЭФФЕКТ ПУЛЬСАЦИИ) */
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 4px rgba(255, 202, 40, 0.25); border-color: rgba(255, 202, 40, 0.5); }
+            50% { box-shadow: 0 0 14px rgba(255, 202, 40, 0.85); border-color: #ffca28; }
+            100% { box-shadow: 0 0 4px rgba(255, 202, 40, 0.25); border-color: rgba(255, 202, 40, 0.5); }
+        }
+        .flashing-btn {
+            animation: goldPulse 2s infinite ease-in-out;
+        }
+
+        /* СТИЛЬ ДЛЯ ЗАБЛОКИРОВАННЫХ ШАГОВ И ТАЙМЕРОВ */
+        .item-card-btn:disabled {
+            border-color: #2b2511 !important;
+            color: #554824 !important;
+            background: none !important;
+            cursor: not-allowed;
+            animation: none !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
 <body>
@@ -203,35 +224,29 @@
     <!-- ГЛАВНОЕ МЕНЮ ИГРЫ (ОТКРЫВАЕТСЯ ПРИ ВХОДЕ)           -->
     <!-- ==================================================== -->
     <div id="mainMenuScreen" class="main-menu-container">
-        <!-- Заголовок Главная сверху -->
         <div style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffca28; position: relative;">
             Главная
             <span style="position: absolute; right: 0; top: -2px; font-size: 1.3rem; color: #ffca28; cursor: pointer;" onclick="tg?.close();">&times;</span>
         </div>
         
-        <!-- Три основные кнопки выбора -->
-        <button class="menu-btn" onclick="NavModule.showScreen('playScreen')">Играть</button>
-        <button class="menu-btn" onclick="NavModule.showScreen('leaderboardScreen')">Топ 100 игроков</button>
-        <button class="menu-btn" onclick="NavModule.showScreen('shopScreen')">Магазин</button>
+        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('playScreen')">Играть</button>
+        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('leaderboardScreen')">Топ 100 игроков</button>
+        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('shopScreen')">Магазин</button>
     </div>
-
 
     <!-- ==================================================== -->
     <!-- РАЗДЕЛ 1: ЭКРАН «ИГРА» (ЧИСТЫЙ КЛИКЕР)              -->
     <!-- ==================================================== -->
     <div id="playScreen" class="screen-overlay">
         <div class="screen-content">
-            <!-- Кнопка выхода в главное меню -->
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Игра</div>
             
-            <!-- Информационная панель двух балансов -->
             <div class="click-balance-display">
                 <div class="gold-row">🪙 <span id="gameGoldBal">0</span> G</div>
                 <div class="diam-row">💎 <span id="gameDiamBal">0</span></div>
             </div>
 
-            <!-- Круглая монета для бесконечных тапов -->
             <div class="coin-box">
                 <button class="round-coin-btn" onclick="AppLogic.tapCoin()">
                     <svg class="coin-img" viewBox="0 0 100 100" xmlns="http://w3.org">
@@ -243,73 +258,125 @@
             </div>
         </div>
     </div>
-
-
     <!-- ==================================================== -->
     <!-- РАЗДЕЛ 2: ЭКРАН «ТОП 100 ИГРОКОВ»                   -->
     <!-- ==================================================== -->
     <div id="leaderboardScreen" class="screen-overlay">
         <div class="screen-content">
-            <!-- Кнопка выхода в главное меню -->
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Топ 100 игроков</div>
             
-            <!-- Индикатор общего фонда от рекламы -->
             <div style="font-size: 1.05rem; color: #ffca28; font-weight: bold; margin-bottom: 5px; text-align: center;">
                 💰 Общий фонд: <span id="prizePoolTxt">1684</span> 💎
             </div>
             <div id="seasonTimerDisplay" style="text-align: center; font-size: 0.8rem; color: #8986a3; margin-bottom: 15px;">До обнуления: --</div>
             
-            <!-- Динамические строки лидерборда -->
             <div id="htmlLeaderboardRows"></div>
         </div>
     </div>
 
-
     <!-- ==================================================== -->
-    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН» (ТОЛЬКО РЕКЛАМНЫЙ БОНУС)  -->
+    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН» (РЕКЛАМНЫЕ БОНУСЫ)        -->
     <!-- ==================================================== -->
     <div id="shopScreen" class="screen-overlay">
-        <div class="screen-content">
-            <!-- Кнопка выхода в главное меню -->
+        <div class="screen-content" style="max-width: 360px;">
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Магазин</div>
             
-            <!-- Единственная карточка — рекламный бонус -->
-            <div class="item-card">
-                <div style="font-size: 0.95rem; font-weight: bold; color: #ff4a4a;">🎬 Рекламный бонус</div>
-                <div style="font-size: 0.8rem; color: #8986a3;">Посмотрите ролик AdsGram, чтобы забрать <span style="color: #ffca28;">+1 Алмаз 💎</span></div>
-                <button class="item-card-btn" style="border-color: #ff4a4a; color: #ff4a4a;" onclick="AppLogic.openConfirmModal()">Забрать бонус</button>
+            <div class="shop-list-container" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                
+                <!-- КНОПКА №1: Одиночный рекламный бонус (С ТАЙМЕРОМ И ЛИМИТОМ 5/5) -->
+                <div class="item-card">
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #f87171; width: 100%; display: flex; justify-content: space-between;">
+                        <span>🎬 Рекламный бонус</span>
+                        <span id="adSingleLimitTxt" style="color: #ffca28;">5/5</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #8986a3;">Посмотрите ролик AdsGram, чтобы забрать <span style="color: #ffca28;">+1 Алмаз 💎</span></div>
+                    <button id="adSingleBtn" class="item-card-btn flashing-btn" style="border-color: #f87171; color: #f87171;" onclick="AppLogic.openSingleAdConfirmModal()">Забрать бонус (+1 💎)</button>
+                </div>
+
+                <!-- КНОПКА №2: Ежедневная цепочка наград за просмотр (5 шагов) -->
+                <div style="font-size: 0.95rem; font-weight: bold; text-align: center; color: #ffca28; margin-top: 5px;">🔥 Цепочка наград (Сброс в 8:00 МСК)</div>
+                
+                <!-- Шаг 1: +500 G -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 1: 🎬 Бонус</span> <span style="color: #ffca28;">+500 G</span>
+                    </div>
+                    <button id="chainBtn-1" class="item-card-btn flashing-btn" onclick="AppLogic.openChainConfirmModal(1)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 2: +1000 G -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 2: 🎬 Бонус</span> <span style="color: #ffca28;">+1 000 G</span>
+                    </div>
+                    <button id="chainBtn-2" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(2)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 3: +2500 G -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 3: 🎬 Бонус</span> <span style="color: #ffca28;">+2 500 G</span>
+                    </div>
+                    <button id="chainBtn-3" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(3)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 4: +5000 G -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 4: 🎬 Бонус</span> <span style="color: #ffca28;">+5 000 G</span>
+                    </div>
+                    <button id="chainBtn-4" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(4)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 5: +10000 G -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 5: 👑 МЕГА БОНУС</span> <span style="color: #ffca28; font-weight: bold;">+10 000 G</span>
+                    </div>
+                    <button id="chainBtn-5" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(5)">Смотреть рекламу</button>
+                </div>
+
             </div>
         </div>
     </div>
-
 
     <!-- ВССПЛЫВАЮЩЕЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЕЙСТВИЯ (CONFIRM) -->
     <div id="confirmActionModal" class="modal">
         <div class="modal-content" style="max-width: 320px; border-color: #ffca28;">
             <div class="modal-title" style="color: #ffca28; font-size: 1.1rem;">Подтвердить действие?</div>
             <div class="confirm-box">
-                <div class="confirm-text">Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислен 1 Алмаз 💎.</div>
+                <div id="confirmModalBodyText" class="confirm-text">Вы действительно хотите посмотреть рекламу?</div>
                 <div class="confirm-buttons-row">
-                    <button class="confirm-choice-btn" onclick="AppLogic.closeConfirmModal(false)">ОТМЕНИТЬ</button>
-                    <button class="confirm-choice-btn yes" onclick="AppLogic.closeConfirmModal(true)">ПОДТВЕРДИТЬ</button>
+                    <button class="confirm-choice-btn flashing-btn" onclick="AppLogic.closeConfirmModal(false)">ОТМЕНИТЬ</button>
+                    <button class="confirm-choice-btn yes flashing-btn" onclick="AppLogic.closeConfirmModal(true)">ПОДТВЕРДИТЬ</button>
                 </div>
             </div>
         </div>
-                </div>
-                <script>
+    </div>
+    <script>
         // ====================================================
         // 1. ХРАНИЛИЩЕ ДАННЫХ И СИНХРОНИЗАЦИЯ С ПАМЯТЬЮ
         // ====================================================
         const GameStore = {
             gold: parseInt(localStorage.getItem('g_click_gold')) || 0,
             diamonds: parseInt(localStorage.getItem('g_click_diamonds')) || 0,
-            clickPower: 1, // Базовый бесконечный клик равен +1 G
+            clickPower: 1, // Бесконечный клик всегда +1 G
             
             // Базовый стартовый фонд по твоей 3Х-модели
             totalPrizePool: parseFloat(localStorage.getItem('g_prize_pool')) || 1684,
             nextResetTime: parseInt(localStorage.getItem('g_next_reset')) || 0,
+            
+            // Сохранение шагов цепочки наград (Золото)
+            currentChainStep: parseInt(localStorage.getItem('g_chain_step')) || 1,
+            lastChainResetTime: parseInt(localStorage.getItem('g_chain_reset_time')) || 0,
+
+            // Сохранение лимитов и таймеров одиночной рекламы (Алмазы)
+            singleAdCount: parseInt(localStorage.getItem('g_single_ad_count')) || 0,
+            singleAdCooldownEnd: parseInt(localStorage.getItem('g_single_cooldown_end')) || 0,
+            lastSingleAdResetTime: parseInt(localStorage.getItem('g_single_reset_time')) || 0,
+            
             localLeaderboardList: []
         };
 
@@ -318,91 +385,194 @@
         if (tg) tg.expand();
 
         function syncAndRefreshUI() {
+            // Обновление балансов на экране "Игра"
             document.getElementById('gameGoldBal').innerText = Math.floor(GameStore.gold);
             document.getElementById('gameDiamBal').innerText = GameStore.diamonds;
-            
             if(document.getElementById('prizePoolTxt')) document.getElementById('prizePoolTxt').innerText = Math.floor(GameStore.totalPrizePool);
 
-            // Запись данных в память устройства
+            // Сохраняем переменные в локальную память устройства
             localStorage.setItem('g_click_gold', GameStore.gold.toString());
             localStorage.setItem('g_click_diamonds', GameStore.diamonds.toString());
             localStorage.setItem('g_prize_pool', GameStore.totalPrizePool.toString());
             localStorage.setItem('g_next_reset', GameStore.nextResetTime.toString());
-        }
+            localStorage.setItem('g_chain_step', GameStore.currentChainStep.toString());
+            localStorage.setItem('g_chain_reset_time', GameStore.lastChainResetTime.toString());
+            localStorage.setItem('g_single_ad_count', GameStore.singleAdCount.toString());
+            localStorage.setItem('g_single_cooldown_end', GameStore.singleAdCooldownEnd.toString());
+            localStorage.setItem('g_single_reset_time', GameStore.lastSingleAdResetTime.toString());
+            
+            // ОБНОВЛЕНИЕ КНОПКИ №1 (ОДИНОЧНЫЙ БОНУС С ЛИМИТОМ И КУЛДАУНОМ)
+            const remainingAds = 5 - GameStore.singleAdCount;
+            const limitDisplay = document.getElementById('adSingleLimitTxt');
+            if (limitDisplay) limitDisplay.innerText = `${remainingAds}/5`;
 
+            const singleBtn = document.getElementById('adSingleBtn');
+            if (singleBtn) {
+                const now = Date.now();
+                if (GameStore.singleAdCount >= 5) {
+                    singleBtn.disabled = true;
+                    singleBtn.classList.remove('flashing-btn');
+                    singleBtn.innerText = "Лимит на сегодня исчерпан 🔒";
+                    singleBtn.style.borderColor = "#2b2511";
+                    singleBtn.style.color = "#554824";
+                } else if (now < GameStore.singleAdCooldownEnd) {
+                    singleBtn.disabled = true;
+                    singleBtn.classList.remove('flashing-btn');
+                    singleBtn.style.borderColor = "#2b2511";
+                    singleBtn.style.color = "#554824";
+                    
+                    const diff = GameStore.singleAdCooldownEnd - now;
+                    const mins = Math.floor(diff / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                    const formattedSecs = secs < 10 ? '0' + secs : secs;
+                    singleBtn.innerText = `Подождите ⏳ 0${mins}:${formattedSecs}`;
+                } else {
+                    singleBtn.disabled = false;
+                    singleBtn.classList.add('flashing-btn');
+                    singleBtn.innerText = "Забрать бонус (+1 💎)";
+                    singleBtn.style.borderColor = "#f87171";
+                    singleBtn.style.color = "#f87171";
+                }
+            }
+
+            // ОБНОВЛЕНИЕ КНОПКИ №2 (БЛОКИРОВКА И МИГАНИЕ ЦЕПОЧКИ ЗОЛОТА)
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`chainBtn-${i}`);
+                if (btn) {
+                    if (i === GameStore.currentChainStep) {
+                        btn.disabled = false;
+                        btn.classList.add('flashing-btn');
+                        btn.innerText = "Смотреть рекламу";
+                    } else if (i < GameStore.currentChainStep) {
+                        btn.disabled = true;
+                        btn.classList.remove('flashing-btn');
+                        btn.innerText = "Забрано ✓";
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.remove('flashing-btn');
+                        btn.innerText = "Заблокировано 🔒";
+                    }
+                }
+            }
+        }
         // ====================================================
         // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
         // ====================================================
         const NavModule = {
             showScreen: function(screenId) {
-                // Прячем главное меню и все оверлеи
                 document.getElementById('mainMenuScreen').style.display = 'none';
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
-                
-                // Включаем выбранный экран
                 document.getElementById(screenId).style.display = 'flex';
                 
-                // При открытии ТОП 100 обновляем позиции
                 if (screenId === 'leaderboardScreen') {
                     LeaderboardModule.refreshLeaderboard();
                 }
             },
             backToMenu: function() {
-                // Закрываем разделы и выводим Главную панель на экран
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
                 document.getElementById('mainMenuScreen').style.display = 'flex';
             }
         };
 
         // ====================================================
-        // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, CONFIRM И СЕТЬ ADSGRAM)
+        // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, CONFIRM, СБРОС МСК И РЕКЛАМА)
         // ====================================================
         const AppLogic = {
+            activeAdMode: null, // "single" или номер шага (1-5)
+
             tapCoin: function() {
-                // Бесконечный клик по монете
                 GameStore.gold += GameStore.clickPower;
                 syncAndRefreshUI();
                 LeaderboardModule.refreshLeaderboard();
             },
 
-            openConfirmModal: function() {
+            openSingleAdConfirmModal: function() {
+                if (GameStore.singleAdCount >= 5 || Date.now() < GameStore.singleAdCooldownEnd) return;
+                this.activeAdMode = "single";
+                document.getElementById('confirmModalBodyText').innerText = "Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислен 1 Алмаз 💎.";
+                document.getElementById('confirmActionModal').style.display = 'flex';
+            },
+
+            openChainConfirmModal: function(stepNumber) {
+                if (stepNumber !== GameStore.currentChainStep) return;
+                this.activeAdMode = stepNumber;
+                const rewardsMap = { 1: 500, 2: 1000, 3: 2500, 4: 5000, 5: 10000 };
+                const goldReward = rewardsMap[stepNumber] || 500;
+                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислено +${goldReward.toLocaleString()} G!`;
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
 
             closeConfirmModal: function(isConfirmed) {
                 document.getElementById('confirmActionModal').style.display = 'none';
-                if (isConfirmed) {
-                    this.executeAdsGramCall();
+                if (isConfirmed && this.activeAdMode !== null) {
+                    this.executeAdsGramCall(this.activeAdMode);
                 }
+                this.activeAdMode = null;
             },
 
-            executeAdsGramCall: function() {
+            executeAdsGramCall: function(mode) {
                 const AdController = window.AdsGram?.createAdListener({ blockId: "44331" });
                 
+                const processReward = () => {
+                    if (mode === "single") {
+                        GameStore.diamonds += 1; // +1 Алмаз на личный счет
+                        GameStore.totalPrizePool += 1; // +1 Алмаз в фонд турнира
+                        GameStore.singleAdCount += 1; // Повышаем счетчик лимита
+                        GameStore.singleAdCooldownEnd = Date.now() + (5 * 60 * 1000); // 5 минут КД таймер
+                        alert("🎉 Награда получена! Вам начислен +1 Алмаз 💎. Общий фонд увеличен, таймер на 5 минут запущен!");
+                    } else {
+                        const rewardsMap = { 1: 500, 2: 1000, 3: 2500, 4: 5000, 5: 10000 };
+                        const goldReward = rewardsMap[mode] || 500;
+                        
+                        GameStore.gold += goldReward; // Начисляем золото G по шагу цепочки
+                        GameStore.totalPrizePool += 1; // С каждой рекламы цепочки тоже +1 в фонд!
+                        GameStore.currentChainStep += 1; // Сдвигаем цепочку вперед
+                        alert(`🎉 Награда получена! Вам начислено +${goldReward.toLocaleString()} G. Общий фонд турнира увеличен на +1 💎!`);
+                    }
+                    syncAndRefreshUI();
+                    LeaderboardModule.refreshLeaderboard();
+                };
+
                 if (AdController) {
                     AdController.show()
-                        .then((result) => {
-                            GameStore.diamonds += 1;
-                            GameStore.totalPrizePool += 1; // Растет весь фонд одновременно
-                            
-                            syncAndRefreshUI();
-                            LeaderboardModule.renderHTML();
-                            alert("🎉 Награда получена! Вам начислен +1 Алмаз 💎. Общий фонд турнира увеличен!");
-                        })
-                        .catch((err) => {
-                            alert("Реклама не загрузилась. Попробуйте еще раз позже.");
-                        });
+                        .then((result) => { processReward(); })
+                        .catch((err) => { alert("Реклама не успела загрузиться. Пожалуйста, попробуйте еще раз."); });
                 } else {
-                    // Тест в браузере вне Телеграма
-                    GameStore.diamonds += 1;
-                    GameStore.totalPrizePool += 1;
+                    processReward();
+                }
+            },
+            checkDailyChainReset: function() {
+                const now = new Date();
+                const mskOffset = 3 * 60 * 60 * 1000;
+                const nowMsk = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + mskOffset);
+                
+                const targetReset = new Date(nowMsk);
+                targetReset.setHours(8, 0, 0, 0);
+                
+                if (nowMsk.getTime() < targetReset.getTime()) {
+                    targetReset.setDate(targetReset.getDate() - 1);
+                }
+
+                const resetTimestamp = targetReset.getTime();
+
+                // Сброс золотой цепочки наград в 8:00 по МСК
+                if (GameStore.lastChainResetTime < resetTimestamp) {
+                    GameStore.currentChainStep = 1;
+                    GameStore.lastChainResetTime = Date.now();
                     syncAndRefreshUI();
-                    LeaderboardModule.renderHTML();
-                    alert("📺 Тест: Реклама просмотрена! Получен +1 💎");
+                }
+
+                // Сброс лимитов алмазов (5/5) и кулдаунов в 8:00 по МСК
+                if (GameStore.lastSingleAdResetTime < resetTimestamp) {
+                    GameStore.singleAdCount = 0;
+                    GameStore.singleAdCooldownEnd = 0;
+                    GameStore.lastSingleAdResetTime = Date.now();
+                    syncAndRefreshUI();
                 }
             }
         };
-// ====================================================
+
+        // ====================================================
         // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
         // ====================================================
         const LeaderboardModule = {
@@ -426,7 +596,6 @@
                 let telegramName = "Игрок";
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
                     const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-                    // Убрали принудительный знак @ перед юзернеймом
                     telegramName = tgUser.username ? `${tgUser.username}` : `${tgUser.first_name}`;
                 } else {
                     // Локальная заглушка для тестов в обычном браузере
@@ -448,7 +617,6 @@
                 
                 this.renderHTML();
             },
-
             renderHTML: function() {
                 const targetList = document.getElementById('htmlLeaderboardRows');
                 if (!targetList) return;
@@ -478,7 +646,7 @@
                     else if (pos === 2) positionDisplay = "🥈";
                     else if (pos === 3) positionDisplay = "🥉";
 
-                    // Цвета и свечение для твоего профиля
+                    // Цвета и свечение для вашего профиля
                     let rowStyle = "";
                     let nameColor = "#ffffff";
                     let isBold = "font-weight: 500;";
@@ -526,6 +694,9 @@
                     const s = Math.floor((tDiff % (1000 * 60)) / 1000);
                     
                     document.getElementById('seasonTimerDisplay').innerText = `До обнуления: ${d}д ${h}ч ${m}м ${s}с`;
+                    
+                    // Вызываем перерисовку интерфейса каждую секунду для плавного тиканья кулдауна кнопки
+                    syncAndRefreshUI();
                 }, 1000);
             }
         };
@@ -537,7 +708,12 @@
             syncAndRefreshUI();
             LeaderboardModule.refreshLeaderboard();
             LeaderboardModule.initTimer();
+            
+            // Проверяем сброс цепочки рекламы и лимитов в 8:00 по МСК при входе
+            AppLogic.checkDailyChainReset();
+            // Раз в минуту проверяем время на случай, если игра открыта долго
+            setInterval(() => { AppLogic.checkDailyChainReset(); }, 60000);
         });
     </script>
 </body>
-</html>                    
+</html>
