@@ -275,17 +275,18 @@
         </div>
     </div>
 
-    <!-- ==================================================== -->
-    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН» (РЕКЛАМНЫЕ БОНУСЫ)        -->
+<!-- ==================================================== -->
+    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН» (КОМПАКТНЫЙ ВАРИАНТ)      -->
     <!-- ==================================================== -->
     <div id="shopScreen" class="screen-overlay">
-        <div class="screen-content" style="max-width: 360px;">
+        <div class="screen-content">
+            <!-- Кнопка выхода в главное меню -->
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Магазин</div>
             
             <div class="shop-list-container" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
                 
-                <!-- КНОПКА №1: Одиночный рекламный бонус (С ТАЙМЕРОМ И ЛИМИТОМ 5/5) -->
+                <!-- КНОПКА №1: Одиночный рекламный бонус -->
                 <div class="item-card">
                     <div style="font-size: 0.95rem; font-weight: bold; color: #f87171; width: 100%; display: flex; justify-content: space-between;">
                         <span>🎬 Рекламный бонус</span>
@@ -295,10 +296,29 @@
                     <button id="adSingleBtn" class="item-card-btn flashing-btn" style="border-color: #f87171; color: #f87171;" onclick="AppLogic.openSingleAdConfirmModal()">Забрать бонус (+1 💎)</button>
                 </div>
 
-                <!-- КНОПКА №2: Ежедневная цепочка наград за просмотр (5 шагов) -->
-                <div style="font-size: 0.95rem; font-weight: bold; text-align: center; color: #ffca28; margin-top: 5px;">🔥 Цепочка наград (Сброс в 8:00 МСК)</div>
-                
-                <!-- Шаг 1: +500 G -->
+                <!-- КНОПКА №2: Точка входа в ежедневную цепочку (Вместо длинного списка) -->
+                <div class="item-card">
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #ffca28;">🔥 Цепочка наград</div>
+                    <div style="font-size: 0.8rem; color: #8986a3;">Забирайте до <span style="color: #ffca28;">+10 000 G</span> за просмотры каждый день!</div>
+                    <button class="item-card-btn flashing-btn" onclick="NavModule.openChainPanel()">Открыть список наград</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- НОВОЕ ОТДЕЛЬНОЕ ОКНО: СПИСОК ШАГОВ ЦЕПОЧКИ           -->
+    <!-- ==================================================== -->
+    <div id="chainRewardsModal" class="modal" style="z-index: 1050;">
+        <div class="modal-content" style="max-width: 360px; border-color: #ffca28;">
+            <!-- Кнопка закрытия панели и возврата в магазин -->
+            <span class="modal-close" style="color: #ffca28;" onclick="NavModule.closeChainPanel()">&times;</span>
+            <div class="modal-title" style="color: #ffca28; font-size: 1.2rem;">🔥 Цепочка наград</div>
+            <div style="font-size: 0.8rem; color: #8986a3; text-align: center; margin-bottom: 15px;">Сброс прогресса каждый день в 8:00 по МСК</div>
+
+            <div class="shop-list-container" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <!-- Шаг 1 -->
                 <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
                     <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
                         <span>Шаг 1: 🎬 Бонус</span> <span style="color: #ffca28;">+500 G</span>
@@ -306,7 +326,7 @@
                     <button id="chainBtn-1" class="item-card-btn flashing-btn" onclick="AppLogic.openChainConfirmModal(1)">Смотреть рекламу</button>
                 </div>
 
-                <!-- Шаг 2: +1000 G -->
+                <!-- Шаг 2 -->
                 <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
                     <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
                         <span>Шаг 2: 🎬 Бонус</span> <span style="color: #ffca28;">+1 000 G</span>
@@ -314,7 +334,7 @@
                     <button id="chainBtn-2" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(2)">Смотреть рекламу</button>
                 </div>
 
-                <!-- Шаг 3: +2500 G -->
+                <!-- Шаг 3 -->
                 <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
                     <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
                         <span>Шаг 3: 🎬 Бонус</span> <span style="color: #ffca28;">+2 500 G</span>
@@ -322,7 +342,7 @@
                     <button id="chainBtn-3" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(3)">Смотреть рекламу</button>
                 </div>
 
-                <!-- Шаг 4: +5000 G -->
+                <!-- Шаг 4 -->
                 <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
                     <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
                         <span>Шаг 4: 🎬 Бонус</span> <span style="color: #ffca28;">+5 000 G</span>
@@ -330,14 +350,13 @@
                     <button id="chainBtn-4" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(4)">Смотреть рекламу</button>
                 </div>
 
-                <!-- Шаг 5: +10000 G -->
+                <!-- Шаг 5 -->
                 <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px;">
                     <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
                         <span>Шаг 5: 👑 МЕГА БОНУС</span> <span style="color: #ffca28; font-weight: bold;">+10 000 G</span>
                     </div>
                     <button id="chainBtn-5" class="item-card-btn" onclick="AppLogic.openChainConfirmModal(5)">Смотреть рекламу</button>
                 </div>
-
             </div>
         </div>
     </div>
