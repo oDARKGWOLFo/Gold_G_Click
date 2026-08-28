@@ -402,46 +402,48 @@
                 }
             }
         };
-                    // ====================================================
+// ====================================================
         // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
         // ====================================================
         const LeaderboardModule = {
             refreshLeaderboard: function() {
-                // Если таблица пустая — генерируем 99 ботов для создания конкуренции
+                // ШАГ 1. Сначала железно создаем 99 ботов, если их еще нет в памяти
                 if (GameStore.localLeaderboardList.length === 0) {
                     for (let i = 1; i <= 99; i++) {
                         GameStore.localLeaderboardList.push({
                             id: i,
                             name: `User_Click_${Math.floor(Math.random() * 9000 + 1000)}`,
-                            gold: Math.floor(48000 - (i * 450)),
+                            gold: Math.floor(45000 - (i * 400)),
                             isMe: false
                         });
                     }
                 }
 
-                // ПОДТЯГИВАЕМ НАСТОЯЩЕЕ ИМЯ ИЛИ ЮЗЕРНЕЙМ ИЗ ТЕЛЕГРАМА
+                // ШАГ 2. Очищаем старые записи РЕАЛЬНОГО игрока, чтобы они не дублировались
+                GameStore.localLeaderboardList = GameStore.localLeaderboardList.filter(player => player.id !== "me" && !player.isMe);
+
+                // ШАГ 3. Строго запрашиваем никнейм у Telegram Mini Apps SDK (БЕЗ ЗНАКА @)
                 let telegramName = "Игрок";
                 if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
                     const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-                    telegramName = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+                    // Убрали принудительный знак @ перед юзернеймом
+                    telegramName = tgUser.username ? `${tgUser.username}` : `${tgUser.first_name}`;
                 } else {
                     // Локальная заглушка для тестов в обычном браузере
-                    telegramName = localStorage.getItem('g_player_mock_name') || `User_Click_${Math.floor(Math.random() * 8000 + 1000)}`;
+                    telegramName = localStorage.getItem('g_player_mock_name') || "Тест_Админ";
                     localStorage.setItem('g_player_mock_name', telegramName);
                 }
 
+                // ШАГ 4. Создаем чистый профиль реального игрока
                 const myProfile = { 
                     id: "me", 
-                    name: telegramName, // Настоящий ник игрока выводится на экран!
+                    name: telegramName, 
                     gold: GameStore.gold, 
                     isMe: true 
                 };
                 
-                const myOldIndex = GameStore.localLeaderboardList.findIndex(p => p.isMe);
-                if (myOldIndex !== -1) GameStore.localLeaderboardList.splice(myOldIndex, 1);
-                
+                // ШАГ 5. Добавляем игрока в таблицу ПОВЕРХ ботов и сортируем строго по золоту G
                 GameStore.localLeaderboardList.push(myProfile);
-                // Сортируем строго по золоту сверху вниз
                 GameStore.localLeaderboardList.sort((a, b) => b.gold - a.gold);
                 
                 this.renderHTML();
@@ -459,7 +461,7 @@
                     const pos = idx + 1;
                     let calculatedReward = 0;
 
-                    // Умное процентное деление общего фонда (защита от перевернутых наград)
+                    // Умное процентное деление общего фонда
                     if (pos === 1) calculatedReward = Math.round(GameStore.totalPrizePool * 0.25);
                     else if (pos === 2) calculatedReward = Math.round(GameStore.totalPrizePool * 0.15);
                     else if (pos === 3) calculatedReward = Math.round(GameStore.totalPrizePool * 0.10);
@@ -470,19 +472,33 @@
 
                     if (calculatedReward < 1) calculatedReward = 1; // Защита от нуля
 
+                    // Настройка отображения позиции (медали для топ-3)
+                    let positionDisplay = pos;
+                    if (pos === 1) positionDisplay = "🥇";
+                    else if (pos === 2) positionDisplay = "🥈";
+                    else if (pos === 3) positionDisplay = "🥉";
+
+                    // Цвета и свечение для твоего профиля
+                    let rowStyle = "";
+                    let nameColor = "#ffffff";
+                    let isBold = "font-weight: 500;";
+
+                    if (player.isMe) {
+                        rowStyle = "border: 1.5px solid #ffca28; background: rgba(255, 202, 40, 0.08);";
+                        nameColor = "#ffca28; text-shadow: 0 0 5px rgba(255, 202, 40, 0.3);";
+                        isBold = "font-weight: bold;";
+                    }
+
                     const rowDiv = document.createElement('div');
-                    rowDiv.className = `leader-row ${player.isMe ? 'me' : ''}`;
+                    rowDiv.className = `leader-row`;
+                    if (rowStyle) rowDiv.setAttribute("style", rowStyle);
+
+                    // Уменьшенный размер шрифта (0.8rem) и точные проценты ширины, чтобы всё влезло ровно
                     rowDiv.innerHTML = `
-                        <span class="ldr-pos">${pos}</span>
-                        <span class="ldr-name" style="
-                            flex: 1.8; 
-                            font-size: 0.88rem;
-                            white-space: nowrap; 
-                            overflow: visible; 
-                            ${player.isMe ? 'color: #ffca28; font-weight: bold; text-shadow: 0 0 5px rgba(255, 202, 40, 0.4);' : 'color: #ffffff;'}
-                        ">${player.name}</span>
-                        <span style="flex: 1; color: #ffca28; font-size: 0.85rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 5px;">🪙 ${Math.floor(player.gold).toLocaleString()}</span>
-                        <span class="ldr-prize" style="flex: 0.8; text-align: right; white-space: nowrap;">${calculatedReward} 💎</span>
+                        <span class="ldr-pos" style="width: 10%; text-align: left; font-size: ${pos <= 3 ? '1.05rem' : '0.8rem'};">${positionDisplay}</span>
+                        <span class="ldr-name" style="width: 42%; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ${nameColor}; ${isBold}">${player.name}</span>
+                        <span style="width: 28%; font-size: 0.8rem; text-align: right; white-space: nowrap; color: #ffca28; ${isBold}">🪙 ${Math.floor(player.gold).toLocaleString()}</span>
+                        <span class="ldr-prize" style="width: 20%; font-size: 0.8rem; text-align: right; white-space: nowrap; color: #e040fb;">${calculatedReward} 💎</span>
                     `;
                     targetList.appendChild(rowDiv);
                 });
@@ -524,4 +540,4 @@
         });
     </script>
 </body>
-</html>
+</html>                    
