@@ -745,21 +745,47 @@
             },
 
             initTimer: function() {
-                if (!GameStore.nextResetTime) {
-                    GameStore.nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000); // Сезон равен 7 дням
-                }
+                // Функция расчета даты ближайшего понедельника 8:00 МСК
+                const getNextMondayResetMsk = () => {
+                    const now = new Date();
+                    const mskOffset = 3 * 60 * 60 * 1000;
+                    // Переводим текущее время в МСК
+                    const nowMsk = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + mskOffset);
+                    
+                    const resultDate = new Date(nowMsk);
+                    // Находим, сколько дней осталось до понедельника (1 - понедельник)
+                    const currentDay = nowMsk.getDay();
+                    const daysUntilMonday = (8 - currentDay) % 7;
+                    
+                    resultDate.setDate(nowMsk.getDate() + daysUntilMonday);
+                    resultDate.setHours(8, 0, 0, 0);
+                    
+                    // Если сегодня уже понедельник и 8 утра прошло — сдвигаем на следующий понедельник
+                    if (currentDay === 1 && nowMsk.getTime() >= resultDate.getTime()) {
+                        resultDate.setDate(resultDate.getDate() + 7);
+                    }
+                    
+                    // Возвращаем реальный UTC-таймстамп для сравнения с Date.now()
+                    return resultDate.getTime() - mskOffset - (now.getTimezoneOffset() * 60 * 1000);
+                };
+
+                // Жестко привязываем таймер к МСК календарю
+                GameStore.nextResetTime = getNextMondayResetMsk();
 
                 setInterval(() => {
-                    const tDiff = GameStore.nextResetTime - Date.now();
+                    const now = Date.now();
+                    const tDiff = GameStore.nextResetTime - now;
+                    
                     if (tDiff <= 0) {
-                        alert("⏱ Сезон завершен! Балансы золота G сброшены, новый раунд турнира начался.");
+                        alert("⏱ Турнирный сезон завершен! Балансы G обнулены, запущен новый раунд.");
                         GameStore.gold = 0;
                         GameStore.totalPrizePool = 1684;
-                        GameStore.nextResetTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+                        GameStore.nextResetTime = getNextMondayResetMsk(); // Ставим дату следующего понедельника
                         syncAndRefreshUI();
                         this.refreshLeaderboard();
                         return;
                     }
+                    
                     const d = Math.floor(tDiff / (1000 * 60 * 60 * 24));
                     const h = Math.floor((tDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const m = Math.floor((tDiff % (1000 * 60 * 60)) / (1000 * 60));
@@ -767,10 +793,10 @@
                     
                     document.getElementById('seasonTimerDisplay').innerText = `До обнуления: ${d}д ${h}ч ${m}м ${s}с`;
                     
-                    // Вызываем перерисовку интерфейса каждую секунду для плавного тиканья кулдауна кнопки
+                    // Обновляем весь интерфейс каждую секунду (для кулдауна кнопок рекламы)
                     syncAndRefreshUI();
                 }, 1000);
-            }
+                    }
         };
 
         // ====================================================
