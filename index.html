@@ -473,6 +473,50 @@
                     }
                 }
             }
+            // УПРАВЛЕНИЕ ГЛАВНОЙ КНОПКОЙ ЦЕПОЧКИ В МАГАЗИНЕ (С ТAЙМЕРОМ ДО 8:00 МСК)
+            const mainChainOpenBtn = document.querySelector("button[onclick='NavModule.openChainPanel()']");
+            if (mainChainOpenBtn) {
+                if (GameStore.currentChainStep > 5) {
+                    // Если все 5 шагов пройдены — блокируем кнопку и включаем таймер
+                    mainChainOpenBtn.disabled = true;
+                    mainChainOpenBtn.classList.remove('flashing-btn');
+                    mainChainOpenBtn.style.borderColor = "#2b2511";
+                    mainChainOpenBtn.style.color = "#554824";
+
+                    // Считаем время до 8:00 по МСК
+                    const now = new Date();
+                    const mskOffset = 3 * 60 * 60 * 1000;
+                    const nowMsk = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + mskOffset);
+                    
+                    const targetReset = new Date(nowMsk);
+                    targetReset.setHours(8, 0, 0, 0);
+                    
+                    // Если 8 утра сегодня уже прошло, таймер считает до 8 утра завтра
+                    if (nowMsk.getTime() >= targetReset.getTime()) {
+                        targetReset.setDate(targetReset.getDate() + 1);
+                    }
+
+                    const diff = targetReset.getTime() - nowMsk.getTime();
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    // Красивое форматирование нулей (02:05:09)
+                    const fHours = hours < 10 ? '0' + hours : hours;
+                    const fMins = mins < 10 ? '0' + mins : mins;
+                    const fSecs = secs < 10 ? '0' + secs : secs;
+
+                    mainChainOpenBtn.innerText = `Обновление через ⏳ ${fHours}:${fMins}:${fSecs}`;
+                } else {
+                    // Если цепочка еще не пройдена — кнопка активна, мигает и зовет играть
+                    mainChainOpenBtn.disabled = false;
+                    mainChainOpenBtn.classList.add('flashing-btn');
+                    mainChainOpenBtn.innerText = "Открыть список наград";
+                    mainChainOpenBtn.style.borderColor = "#ffca28";
+                    mainChainOpenBtn.style.color = "#ffca28";
+                }
+            }
         }
         // ====================================================
         // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
