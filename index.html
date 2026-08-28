@@ -475,8 +475,9 @@
                     rowDiv.className = `leader-row ${player.isMe ? 'me' : ''}`;
                     rowDiv.innerHTML = `
                         <span class="ldr-pos">${pos}</span>
-                        <span class="ldr-name">${player.name}</span>
-                        <span class="ldr-prize">${calculatedReward} 💎</span>
+                        <span class="ldr-name" style="flex: 1.2;">${player.name}</span>
+                        <span style="flex: 1; color: #ffca28; font-size: 0.85rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 5px;">🪙 ${Math.floor(player.gold).toLocaleString()}</span>
+                        <span class="ldr-prize" style="flex: 0.8; text-align: right; white-space: nowrap;">${calculatedReward} 💎</span>
                     `;
                     targetList.appendChild(rowDiv);
                 });
