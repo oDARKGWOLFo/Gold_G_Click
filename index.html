@@ -488,8 +488,17 @@
                 }
             },
             backToMenu: function() {
+                // Закрываем панель цепочки на всякий случай и возвращаемся в Главное меню
+                this.closeChainPanel();
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
                 document.getElementById('mainMenuScreen').style.display = 'flex';
+            },
+            // НОВЫЕ ФУНКЦИИ ДЛЯ ТВОЕЙ КНОПКИ В МАГАЗИНЕ
+            openChainPanel: function() {
+                document.getElementById('chainRewardsModal').style.display = 'flex';
+            },
+            closeChainPanel: function() {
+                document.getElementById('chainRewardsModal').style.display = 'none';
             }
         };
 
