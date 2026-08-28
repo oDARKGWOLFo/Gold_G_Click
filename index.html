@@ -20,7 +20,7 @@
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #000000; /* Идеально черный фон как на скрине */
+            background: #000000; /* Черный матовый фон */
             color: #ffffff;
             overflow: hidden;
             display: flex;
@@ -38,17 +38,17 @@
             width: 85%;
             max-width: 340px;
             background: #000000;
-            border: 2px solid #ffca28; /* Тонкая желтая рамка вокруг меню */
+            border: 2px solid #ffca28; /* Ярко-золотая рамка вокруг меню */
             border-radius: 20px;
             padding: 25px 20px;
-            box-shadow: 0 0 20px rgba(255, 202, 40, 0.1);
+            box-shadow: 0 0 20px rgba(255, 202, 40, 0.15);
         }
 
         /* КНОПКИ ГЛАВНОГО МЕНЮ */
         .menu-btn {
             background: none;
-            border: 1.5px solid #ffca28; /* Желтая рамка для каждой кнопки */
-            color: #ffca28; /* Желтый текст */
+            border: 1.5px solid #ffca28; /* Ярко-золотая рамка для каждой кнопки */
+            color: #ffca28; /* Ярко-золотой текст */
             border-radius: 12px;
             padding: 15px;
             font-size: 1.05rem;
@@ -78,7 +78,7 @@
             width: 85%;
             max-width: 340px;
             background: #000000;
-            border: 2px solid #ffca28; /* Желтая рамка раздела */
+            border: 2px solid #ffca28; /* Ярко-золотая рамка раздела */
             border-radius: 20px;
             padding: 25px 20px;
             position: relative;
@@ -105,7 +105,7 @@
         /* ПАНЕЛЬ БАЛАНСОВ НА ЭКРАНЕ КЛИКА */
         .click-balance-display {
             background: #000000;
-            border: 1px solid #ffca28; /* Тонкая рамка в стиле скриншота */
+            border: 1px solid #ffca28; /* Переведено на ярко-золотую рамку */
             border-radius: 14px;
             width: 100%;
             padding: 14px;
@@ -134,13 +134,13 @@
         .round-coin-btn:active { transform: scale(0.95); }
         .coin-img {
             width: 190px; height: 190px;
-            filter: drop-shadow(0 0 15px rgba(255, 202, 40, 0.15));
+            filter: drop-shadow(0 0 15px rgba(255, 202, 40, 0.2));
         }
 
-        /* КАРТОЧКИ ВНУТРИ МАГАЗИНА И ТОП-100 */
+        /* КАРТОЧКА ВНУТРИ МАГАЗИНА */
         .item-card {
             background: #000000;
-            border: 1px solid #3a3018; /* Темно-золотой внутренний контур */
+            border: 1px solid #ffca28; /* Переведено на ярко-золотую внутреннюю рамку */
             border-radius: 14px;
             padding: 16px;
             margin-bottom: 15px;
@@ -170,7 +170,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 8px;
-            border-bottom: 1px solid #1c180e;
+            border-bottom: 1px solid rgba(255, 202, 40, 0.2); /* Тонкая ярко-золотая полоска разделения */
             font-size: 0.9rem;
         }
         .ldr-pos { font-weight: bold; color: #ffca28; width: 35px; }
@@ -207,7 +207,7 @@
         <!-- Заголовок Главная сверху -->
         <div style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffca28; position: relative;">
             Главная
-            <span style="position: absolute; right: 0; top: -2px; font-size: 1.3rem; color: #3a3018; cursor: pointer;" onclick="tg?.close();">&times;</span>
+            <span style="position: absolute; right: 0; top: -2px; font-size: 1.3rem; color: #ffca28; cursor: pointer;" onclick="tg?.close();">&times;</span>
         </div>
         
         <!-- Три основные кнопки выбора -->
@@ -218,13 +218,13 @@
 
 
     <!-- ==================================================== -->
-    <!-- РАЗДЕЛ 1: ЭКРАН «ИГРАТЬ» (ЧИСТЫЙ КЛИКЕР)            -->
+    <!-- РАЗДЕЛ 1: ЭКРАН «ИГРА» (ЧИСТЫЙ КЛИКЕР)              -->
     <!-- ==================================================== -->
     <div id="playScreen" class="screen-overlay">
         <div class="screen-content">
             <!-- Кнопка выхода в главное меню -->
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
-            <div class="screen-title">Главная</div>
+            <div class="screen-title">Игра</div>
             
             <!-- Информационная панель двух балансов -->
             <div class="click-balance-display">
@@ -268,7 +268,7 @@
 
 
     <!-- ==================================================== -->
-    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН»                           -->
+    <!-- РАЗДЕЛ 3: ЭКРАН «МАГАЗИН» (ТОЛЬКО РЕКЛАМНЫЙ БОНУС)  -->
     <!-- ==================================================== -->
     <div id="shopScreen" class="screen-overlay">
         <div class="screen-content">
@@ -276,20 +276,7 @@
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Магазин</div>
             
-            <!-- Обмен алмазов на золото -->
-            <div class="item-card">
-                <div style="font-size: 0.95rem; font-weight: bold;">Обмен валюты:<br><span style="color: #ffca28;">1 Алмаз 💎 ➡️ 10 000 G</span></div>
-                <button class="item-card-btn" onclick="AppLogic.exchangeDiamondForGold()">Обменять</button>
-            </div>
-
-            <!-- Прокачка силы клика -->
-            <div class="item-card">
-                <div style="font-size: 0.95rem; font-weight: bold;">Улучшение монеты:<br>Цена: <span id="lvlUpCostTxt" style="color: #ffca28;">1000</span> G</div>
-                <div style="font-size: 0.8rem; color: #8986a3;">Текущая сила: +<span id="lvlUpPowerTxt">1</span> за клик</div>
-                <button class="item-card-btn" onclick="AppLogic.upgradeClickPower()">Купить апгрейд</button>
-            </div>
-
-            <!-- Рекламный бонус на алмаз с окном подтверждения -->
+            <!-- Единственная карточка — рекламный бонус -->
             <div class="item-card">
                 <div style="font-size: 0.95rem; font-weight: bold; color: #ff4a4a;">🎬 Рекламный бонус</div>
                 <div style="font-size: 0.8rem; color: #8986a3;">Посмотрите ролик AdsGram, чтобы забрать <span style="color: #ffca28;">+1 Алмаз 💎</span></div>
@@ -311,16 +298,15 @@
                 </div>
             </div>
         </div>
-    </div>
-    <script>
+                </div>
+                <script>
         // ====================================================
         // 1. ХРАНИЛИЩЕ ДАННЫХ И СИНХРОНИЗАЦИЯ С ПАМЯТЬЮ
         // ====================================================
         const GameStore = {
             gold: parseInt(localStorage.getItem('g_click_gold')) || 0,
             diamonds: parseInt(localStorage.getItem('g_click_diamonds')) || 0,
-            clickPower: parseInt(localStorage.getItem('g_click_pwr')) || 1,
-            clickUpgradeCost: parseInt(localStorage.getItem('g_click_cst')) || 1000,
+            clickPower: 1, // Базовый бесконечный клик равен +1 G
             
             // Базовый стартовый фонд по твоей 3Х-модели
             totalPrizePool: parseFloat(localStorage.getItem('g_prize_pool')) || 1684,
@@ -336,15 +322,11 @@
             document.getElementById('gameGoldBal').innerText = Math.floor(GameStore.gold);
             document.getElementById('gameDiamBal').innerText = GameStore.diamonds;
             
-            if(document.getElementById('lvlUpCostTxt')) document.getElementById('lvlUpCostTxt').innerText = GameStore.clickUpgradeCost;
-            if(document.getElementById('lvlUpPowerTxt')) document.getElementById('lvlUpPowerTxt').innerText = GameStore.clickPower;
             if(document.getElementById('prizePoolTxt')) document.getElementById('prizePoolTxt').innerText = Math.floor(GameStore.totalPrizePool);
 
             // Запись данных в память устройства
             localStorage.setItem('g_click_gold', GameStore.gold.toString());
             localStorage.setItem('g_click_diamonds', GameStore.diamonds.toString());
-            localStorage.setItem('g_click_pwr', GameStore.clickPower.toString());
-            localStorage.setItem('g_click_cst', GameStore.clickUpgradeCost.toString());
             localStorage.setItem('g_prize_pool', GameStore.totalPrizePool.toString());
             localStorage.setItem('g_next_reset', GameStore.nextResetTime.toString());
         }
@@ -367,14 +349,14 @@
                 }
             },
             backToMenu: function() {
-                // Закрываем разделы и выводим Главное меню на экран
+                // Закрываем разделы и выводим Главную панель на экран
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
                 document.getElementById('mainMenuScreen').style.display = 'flex';
             }
         };
 
         // ====================================================
-        // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, ОБМЕН, АПГРЕЙДЫ И CONFIRM)
+        // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, CONFIRM И СЕТЬ ADSGRAM)
         // ====================================================
         const AppLogic = {
             tapCoin: function() {
@@ -382,31 +364,6 @@
                 GameStore.gold += GameStore.clickPower;
                 syncAndRefreshUI();
                 LeaderboardModule.refreshLeaderboard();
-            },
-
-            exchangeDiamondForGold: function() {
-                if (GameStore.diamonds >= 1) {
-                    GameStore.diamonds -= 1;
-                    GameStore.gold += 10000;
-                    syncAndRefreshUI();
-                    LeaderboardModule.refreshLeaderboard();
-                    alert("🔄 Успешно! 1 Алмаз обменился на 10 000 G.");
-                } else {
-                    alert("❌ Недостаточно алмазов 💎 для обмена!");
-                }
-            },
-
-            upgradeClickPower: function() {
-                if (GameStore.gold >= GameStore.clickUpgradeCost) {
-                    GameStore.gold -= GameStore.clickUpgradeCost;
-                    GameStore.clickPower += 1;
-                    // Экспоненциальное удорожание, чтобы сжигать монеты G
-                    GameStore.clickUpgradeCost = Math.round(GameStore.clickUpgradeCost * 2.5);
-                    syncAndRefreshUI();
-                    alert(`💪 Улучшение куплено! Теперь за клик: +${GameStore.clickPower} G!`);
-                } else {
-                    alert("❌ Недостаточно золота G для покупки апгрейда!");
-                }
             },
 
             openConfirmModal: function() {
@@ -431,13 +388,13 @@
                             
                             syncAndRefreshUI();
                             LeaderboardModule.renderHTML();
-                            alert("🎉 Успешно! Вам начислен +1 Алмаз 💎. Общий фонд турнира увеличен!");
+                            alert("🎉 Награда получена! Вам начислен +1 Алмаз 💎. Общий фонд турнира увеличен!");
                         })
                         .catch((err) => {
                             alert("Реклама не загрузилась. Попробуйте еще раз позже.");
                         });
                 } else {
-                    // Тест в браузере
+                    // Тест в браузере вне Телеграма
                     GameStore.diamonds += 1;
                     GameStore.totalPrizePool += 1;
                     syncAndRefreshUI();
@@ -446,7 +403,7 @@
                 }
             }
         };
-        // ====================================================
+                    // ====================================================
         // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
         // ====================================================
         const LeaderboardModule = {
@@ -463,10 +420,20 @@
                     }
                 }
 
-                // Добавляем или обновляем текущую позицию реального игрока
+                // ПОДТЯГИВАЕМ НАСТОЯЩЕЕ ИМЯ ИЛИ ЮЗЕРНЕЙМ ИЗ ТЕЛЕГРАМА
+                let telegramName = "Игрок";
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+                    telegramName = tgUser.username ? `@${tgUser.username}` : `${tgUser.first_name}`;
+                } else {
+                    // Локальная заглушка для тестов в обычном браузере
+                    telegramName = localStorage.getItem('g_player_mock_name') || `User_Click_${Math.floor(Math.random() * 8000 + 1000)}`;
+                    localStorage.setItem('g_player_mock_name', telegramName);
+                }
+
                 const myProfile = { 
                     id: "me", 
-                    name: tg?.initDataUnsafe?.user?.first_name || "Вы (Игрок)", 
+                    name: telegramName, // Настоящий ник игрока выводится на экран!
                     gold: GameStore.gold, 
                     isMe: true 
                 };
