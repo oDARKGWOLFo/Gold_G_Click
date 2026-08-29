@@ -510,6 +510,9 @@
             currentCertStep: parseInt(localStorage.getItem('g_cert_step')) || 1,
             certCooldownEnd: parseInt(localStorage.getItem('g_cert_cooldown_end')) || 0,
             lastCertResetTime: parseInt(localStorage.getItem('g_cert_reset_time')) || 0,
+
+            activeMultiplierName: localStorage.getItem('g_active_mult_name') || null, // Имя бустера, например "x2"
+            activeMultiplierEnd: parseInt(localStorage.getItem('g_active_mult_end')) || 0, // Таймер окончания бустера
             
             localLeaderboardList: []
         };
@@ -537,6 +540,37 @@
             localStorage.setItem('g_cert_step', GameStore.currentCertStep.toString());
             localStorage.setItem('g_cert_cooldown_end', GameStore.certCooldownEnd.toString());
             localStorage.setItem('g_cert_reset_time', GameStore.lastCertResetTime.toString());
+
+            // Сохранение и расчет динамического бустера
+            localStorage.setItem('g_active_mult_name', GameStore.activeMultiplierName || "");
+            localStorage.setItem('g_active_mult_end', GameStore.activeMultiplierEnd.toString());
+
+            const currentTime = Date.now();
+            const badge = document.getElementById('activeBoosterBadge');
+            
+            if (GameStore.activeMultiplierName && currentTime < GameStore.activeMultiplierEnd) {
+                // Если бустер активен и время не вышло — вычисляем множитель клика
+                const multMap = { "x2": 2, "x3": 3, "x4": 4, "x5": 5, "x10": 10 };
+                GameStore.clickPower = multMap[GameStore.activeMultiplierName] || 1;
+
+                // Показываем синюю плашку и обновляем таймер бустера на экране "Игра"
+                if (badge) {
+                    badge.style.display = "block";
+                    document.getElementById('boosterBadgeName').innerText = GameStore.activeMultiplierName.toUpperCase();
+                    
+                    const diff = GameStore.activeMultiplierEnd - currentTime;
+                    const mins = Math.floor(diff / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                    const formattedSecs = secs < 10 ? '0' + secs : secs;
+                    document.getElementById('boosterBadgeTimer').innerText = `${mins}:${formattedSecs}`;
+                }
+            } else {
+                // Если бустера нет или время вышло — сбрасываем силу клика в стандартный +1 G
+                GameStore.clickPower = 1;
+                GameStore.activeMultiplierName = null;
+                GameStore.activeMultiplierEnd = 0;
+                if (badge) badge.style.display = "none";
+            }
             
             // ОБНОВЛЕНИЕ КНОПКИ №1 (ОДИНОЧНЫЙ БОНУС С ЛИМИТОМ И КУЛДАУНОМ)
             const remainingAds = 5 - GameStore.singleAdCount;
@@ -787,6 +821,23 @@
                 document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислено +${goldReward.toLocaleString()} G!`;
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
+            clickStorageCell: function(certName) {
+                const certsMap = { "x2": 1, "x3": 2, "x4": 3, "x5": 4, "x10": 5 };
+                const stepVal = certsMap[certName];
+                
+                // Если бустер еще не заработан в Магазине, ничего не делаем
+                if (GameStore.currentCertStep <= stepVal) return;
+                
+                // Если какой-то бустер уже тикает прямо сейчас, не даем включить новый
+                if (GameStore.activeMultiplierName && Date.now() < GameStore.activeMultiplierEnd) {
+                    alert("У вас уже активен другой бустер! Дождитесь окончания его действия.");
+                    return;
+                }
+
+                this.activeAdMode = "activate_" + certName; // Ставим специальную метку активации
+                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите активировать Сертификат ${certName.toUpperCase()} на 10 минут? Каждое нажатие будет приносить больше золота G!`;
+                document.getElementById('confirmActionModal').style.display = 'flex';
+            },
 
             openCertConfirmModal: function(certStepNumber) {
                 if (certStepNumber !== GameStore.currentCertStep || Date.now() < GameStore.certCooldownEnd) return;
@@ -800,10 +851,23 @@
             closeConfirmModal: function(isConfirmed) {
                 document.getElementById('confirmActionModal').style.display = 'none';
                 if (isConfirmed && this.activeAdMode !== null) {
-                    this.executeAdsGramCall(this.activeAdMode);
+                    if (typeof this.activeAdMode === 'string' && this.activeAdMode.startsWith("activate_")) {
+                        // Логика мгновенной активации бустера без просмотра новой рекламы
+                        const certName = this.activeAdMode.replace("activate_", "");
+                        
+                        GameStore.activeMultiplierName = certName;
+                        GameStore.activeMultiplierEnd = Date.now() + (10 * 60 * 1000); // Ровно 10 минут действия!
+                        
+                        alert(`🔥 Бустер ${certName.toUpperCase()} успешно активирован на 10 минут! Открывайте экран "Игра" и собирайте золото!`);
+                        syncAndRefreshUI();
+                    } else {
+                        // Для всей остальной рекламы (алмазы, золото, получение сертификатов)
+                        this.executeAdsGramCall(this.activeAdMode);
+                    }
                 }
                 this.activeAdMode = null;
             },
+            
             executeAdsGramCall: function(mode) {
                 const AdController = window.AdsGram?.createAdListener({ blockId: "44331" });
                 
