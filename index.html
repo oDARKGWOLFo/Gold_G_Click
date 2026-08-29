@@ -314,17 +314,18 @@
                     <div style="font-size: 0.95rem; font-weight: bold; color: #ffca28;">🔥 Цепочка наград</div>
                     <div style="font-size: 0.8rem; color: #8986a3;">Забирайте до <span style="color: #ffca28;">+10 000 G</span> за просмотры каждый день!</div>
                     <button class="item-card-btn flashing-btn" onclick="NavModule.openChainPanel()">Открыть список наград</button>
+                    
                     <!-- КНОПКА №3: ТРЕТЬЯ КНОПКА СНИЗУ! Цепочка бустеров-сертификатов -->
-                <div class="item-card">
+                <div class="item-card" style="border-color: #00e5ff;">
                     <div style="font-size: 0.95rem; font-weight: bold; color: #00e5ff;">🎫 Цепочка Сертификатов G</div>
                     <div style="font-size: 0.8rem; color: #8986a3;">Собирайте множители от <span style="color: #00e5ff;">x2 до x10</span> каждые 5 минут!</div>
-                    <button id="mainCertOpenBtn" class="item-card-btn flashing-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="NavModule.openCertPanel()">Открыть сертификаты</button>
+                    <button id="mainCertOpenBtn" class="item-card-btn flashing-btn" style="border-color: #00e5ff; color: #00e5ff; width: 100%; margin-top: 5px;" onclick="NavModule.openCertPanel()">Открыть сертификаты</button>
                 </div>
-            </div>
 
             </div>
         </div>
     </div>
+</div>
 
     <!-- ==================================================== -->
     <!-- НОВОЕ ОТДЕЛЬНОЕ ОКНО: СПИСОК ШАГОВ ЦЕПОЧКИ           -->
@@ -447,14 +448,14 @@
                 Ваши активные предметы и бустеры
             </div>
 
-            <!-- Сетка из 12 пустых квадратных ячеек со сглаженными рамками -->
+            <!-- Сетка из 12 ячеек с ID для бустеров -->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin-top: 10px;">
-                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
-                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
-                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
-                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div id="cell-x2" style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.1rem; font-weight: bold; cursor: pointer;">+</div>
+                <div id="cell-x3" style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.1rem; font-weight: bold; cursor: pointer;">+</div>
+                <div id="cell-x4" style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.1rem; font-weight: bold; cursor: pointer;">+</div>
+                <div id="cell-x5" style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.1rem; font-weight: bold; cursor: pointer;">+</div>
                 
-                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div id="cell-x10" style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.1rem; font-weight: bold; cursor: pointer;">+</div>
                 <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
                 <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
                 <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
@@ -698,6 +699,25 @@
                     mainCertOpenBtn.style.borderColor = "#00e5ff";
                     mainCertOpenBtn.style.color = "#00e5ff";
                     mainCertOpenBtn.innerText = "Открыть сертификаты";
+                }
+            }
+
+            // ОТРИСОВКА СЕРТИФИКАТОВ ВНУТРИ СЕТКИ ХРАНИЛИЩА
+            const certCells = { "x2": 1, "x3": 2, "x4": 3, "x5": 4, "x10": 5 };
+            for (let [certKey, stepVal] of Object.entries(certCells)) {
+                const cell = document.getElementById(`cell-${certKey}`);
+                if (cell) {
+                    if (GameStore.currentCertStep > stepVal) {
+                        // Если шаг цепочки уже пройден — сертификат лежит в Хранилище
+                        cell.innerText = certKey.toUpperCase();
+                        cell.style.color = "#00e5ff";
+                        cell.style.borderColor = "#00e5ff";
+                    } else {
+                        // Если еще не заработан — ячейка пустая
+                        cell.innerText = "+";
+                        cell.style.color = "rgba(255, 202, 40, 0.3)";
+                        cell.style.borderColor = "#ffca28";
+                    }
                 }
             }
         }
