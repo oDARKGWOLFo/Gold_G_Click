@@ -945,15 +945,21 @@
                     syncAndRefreshUI();
                 }
 
-                // Сброс цепочки сертификатов в 8:00 по МСК
+                // Сброс цепочки сертификатов в 8:00 по МСК и защита от залипания кнопок
                 if (GameStore.lastCertResetTime < resetTimestamp) {
                     GameStore.currentCertStep = 1;
                     GameStore.certCooldownEnd = 0;
                     GameStore.lastCertResetTime = Date.now();
                     syncAndRefreshUI();
+                } else {
+                    // Защитная проверка: если 8:00 МСК прошло, принудительно открываем клик для текущего шага
+                    const nowMskTime = Date.now();
+                    if (GameStore.certCooldownEnd > nowMskTime + (5 * 60 * 1000)) {
+                        GameStore.certCooldownEnd = 0;
+                        syncAndRefreshUI();
+                    }
                 }
             }
-        };
 
         // ====================================================
         // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
