@@ -254,6 +254,11 @@
         <div class="screen-content">
             <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
             <div class="screen-title">Игра</div>
+
+            <!-- ИНДИКАТОР АКТИВНОГО БУСТЕРА (СВЕРХУ ПО ЦЕНТРУ) -->
+            <div id="activeBoosterBadge" style="display: none; align-self: center; margin: -10px auto 15px auto; background: #000000; border: 1.5px solid #00e5ff; border-radius: 10px; padding: 6px 12px; font-weight: bold; font-size: 0.85rem; color: #00e5ff; text-align: center; width: max-content; box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);">
+                🔥 <span id="boosterBadgeName">X2</span>: <span id="boosterBadgeTimer">10:00</span>
+            </div>
             
             <div class="click-balance-display">
                 <div class="gold-row">🪙 <span id="gameGoldBal">0</span> G</div>
