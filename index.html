@@ -375,6 +375,38 @@
     </div>
 
     <!-- ВССПЛЫВАЮЩЕЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЕЙСТВИЯ (CONFIRM) -->
+    <!-- ==================================================== -->
+    <!-- НОВЫЙ РАЗДЕЛ: ЭКРАН «ХРАНИЛИЩЕ» (ПУСТЫЕ КВАДРАТЫ)    -->
+    <!-- ==================================================== -->
+    <div id="storageScreen" class="screen-overlay">
+        <div class="screen-content" style="max-width: 360px;">
+            <!-- Кнопка выхода в главное меню -->
+            <span class="back-to-menu-btn" onclick="NavModule.backToMenu()">&times;</span>
+            <div class="screen-title">Хранилище</div>
+            
+            <div style="font-size: 0.85rem; color: #8986a3; text-align: center; margin-bottom: 15px;">
+                Ваши активные предметы и бустеры
+            </div>
+
+            <!-- Сетка из 12 пустых квадратных ячеек со сглаженными рамками -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; margin-top: 10px;">
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+                <div style="background: #000000; border: 1.5px solid #ffca28; border-radius: 12px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255, 202, 40, 0.3); font-size: 1.4rem; font-weight: bold; cursor: pointer;">+</div>
+            </div>
+        </div>
+    </div>
     <div id="confirmActionModal" class="modal">
         <div class="modal-content" style="max-width: 320px; border-color: #ffca28;">
             <div class="modal-title" style="color: #ffca28; font-size: 1.1rem;">Подтвердить действие?</div>
@@ -545,12 +577,11 @@
                 }
             },
             backToMenu: function() {
-                // Закрываем панель цепочки на всякий случай и возвращаемся в Главное меню
                 this.closeChainPanel();
+                if(document.getElementById('storageScreen')) document.getElementById('storageScreen').style.display = 'none';
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
                 document.getElementById('mainMenuScreen').style.display = 'flex';
             },
-            // НОВЫЕ ФУНКЦИИ ДЛЯ ТВОЕЙ КНОПКИ В МАГАЗИНЕ
             openChainPanel: function() {
                 document.getElementById('chainRewardsModal').style.display = 'flex';
             },
