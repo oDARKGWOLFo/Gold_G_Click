@@ -684,6 +684,15 @@
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
 
+            openCertConfirmModal: function(certStepNumber) {
+                if (certStepNumber !== GameStore.currentCertStep || Date.now() < GameStore.certCooldownEnd) return;
+                this.activeAdMode = "cert_" + certStepNumber;
+                const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
+                const certName = certsMap[certStepNumber] || "x2";
+                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам в Хранилище будет добавлен Сертификат ${certName}!`;
+                document.getElementById('confirmActionModal').style.display = 'flex';
+            },
+
             closeConfirmModal: function(isConfirmed) {
                 document.getElementById('confirmActionModal').style.display = 'none';
                 if (isConfirmed && this.activeAdMode !== null) {
@@ -693,22 +702,32 @@
             },
 
             executeAdsGramCall: function(mode) {
+            executeAdsGramCall: function(mode) {
                 const AdController = window.AdsGram?.createAdListener({ blockId: "44331" });
                 
                 const processReward = () => {
                     if (mode === "single") {
-                        GameStore.diamonds += 1; // +1 Алмаз на личный счет
-                        GameStore.totalPrizePool += 1; // +1 Алмаз в фонд турнира
-                        GameStore.singleAdCount += 1; // Повышаем счетчик лимита
-                        GameStore.singleAdCooldownEnd = Date.now() + (5 * 60 * 1000); // 5 минут КД таймер
+                        GameStore.diamonds += 1;
+                        GameStore.totalPrizePool += 1;
+                        GameStore.singleAdCount += 1;
+                        GameStore.singleAdCooldownEnd = Date.now() + (5 * 60 * 1000);
                         alert("🎉 Награда получена! Вам начислен +1 Алмаз 💎. Общий фонд увеличен, таймер на 5 минут запущен!");
+                    } else if (typeof mode === 'string' && mode.startsWith("cert_")) {
+                        const currentStepNum = parseInt(mode.replace("cert_", ""));
+                        const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
+                        const awardedCert = certsMap[currentStepNum] || "x2";
+
+                        GameStore.totalPrizePool += 1;
+                        GameStore.currentCertStep += 1;
+                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000);
+                        alert(`🎉 Успешно! Сертификат ${awardedCert} отправлен в ваше Хранилище. Общий фонд турнира увеличен на +1 💎! Следующий шаг доступен через 5 минут.`);
                     } else {
                         const rewardsMap = { 1: 500, 2: 1000, 3: 2500, 4: 5000, 5: 10000 };
                         const goldReward = rewardsMap[mode] || 500;
                         
-                        GameStore.gold += goldReward; // Начисляем золото G по шагу цепочки
-                        GameStore.totalPrizePool += 1; // С каждой рекламы цепочки тоже +1 в фонд!
-                        GameStore.currentChainStep += 1; // Сдвигаем цепочку вперед
+                        GameStore.gold += goldReward;
+                        GameStore.totalPrizePool += 1;
+                        GameStore.currentChainStep += 1;
                         alert(`🎉 Награда получена! Вам начислено +${goldReward.toLocaleString()} G. Общий фонд турнира увеличен на +1 💎!`);
                     }
                     syncAndRefreshUI();
@@ -723,6 +742,7 @@
                     processReward();
                 }
             },
+            
             checkDailyChainReset: function() {
                 const now = new Date();
                 const mskOffset = 3 * 60 * 60 * 1000;
