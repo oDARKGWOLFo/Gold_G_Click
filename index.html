@@ -30,18 +30,26 @@
             height: 100vh;
         }
 
-        /* КОНТЕЙНЕР ГЛАВНОГО МЕНЮ */
+        /* КОНТЕЙНЕР ГЛАВНОГО МЕНЮ С ВЕРТИКАЛЬНОЙ ПРОКРУТКОЙ */
         .main-menu-container {
             display: flex;
             flex-direction: column;
-            gap: 16px;
             width: 85%;
             max-width: 340px;
+            max-height: 75vh; /* Ограничиваем высоту меню, чтобы внутри можно было листать */
+            overflow-y: auto; /* Включаем вертикальный скролл */
             background: #000000;
             border: 2px solid #ffca28; /* Ярко-золотая рамка вокруг меню */
             border-radius: 20px;
             padding: 25px 20px;
             box-shadow: 0 0 20px rgba(255, 202, 40, 0.15);
+            
+            /* Скрываем некрасивую полосу скроллбара */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .main-menu-container::-webkit-scrollbar {
+            display: none; /* Скрываем скроллбар в Телеграме */
         }
 
         /* КНОПКИ ГЛАВНОГО МЕНЮ */
@@ -223,15 +231,20 @@
     <!-- ==================================================== -->
     <!-- ГЛАВНОЕ МЕНЮ ИГРЫ (ОТКРЫВАЕТСЯ ПРИ ВХОДЕ)           -->
     <!-- ==================================================== -->
-    <div id="mainMenuScreen" class="main-menu-container">
-        <div style="font-size: 1.4rem; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffca28; position: relative;">
+    <div id="mainMenuScreen" class="main-menu-container" style="padding-top: 15px;">
+        <!-- Фиксированный заголовок Главная (Всегда стоит сверху) -->
+        <div style="font-size: 1.4rem; font-weight: bold; text-align: center; color: #ffca28; position: sticky; top: 0; background: #000000; padding-bottom: 15px; z-index: 10; width: 100%;">
             Главная
             <span style="position: absolute; right: 0; top: -2px; font-size: 1.3rem; color: #ffca28; cursor: pointer;" onclick="tg?.close();">&times;</span>
         </div>
         
-        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('playScreen')">Играть</button>
-        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('leaderboardScreen')">Топ 100 игроков</button>
-        <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('shopScreen')">Магазин</button>
+        <!-- Скролл-зона: сюда мы будем добавлять новые кнопки, и они будут крутиться вниз/вверх -->
+        <div style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+            <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('playScreen')">Играть</button>
+            <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('leaderboardScreen')">Топ 100 игроков</button>
+            <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('shopScreen')">Магазин</button>
+            <button class="menu-btn flashing-btn" onclick="NavModule.showScreen('storageScreen')">Хранилище</button>
+        </div>
     </div>
 
     <!-- ==================================================== -->
