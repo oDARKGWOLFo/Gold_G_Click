@@ -499,10 +499,6 @@
             singleAdCount: parseInt(localStorage.getItem('g_single_ad_count')) || 0,
             singleAdCooldownEnd: parseInt(localStorage.getItem('g_single_cooldown_end')) || 0,
             lastSingleAdResetTime: parseInt(localStorage.getItem('g_single_reset_time')) || 0,
-
-            currentCertStep: parseInt(localStorage.getItem('g_cert_step')) || 1, // Текущий шаг сертификатов (1-5)
-            certCooldownEnd: parseInt(localStorage.getItem('g_cert_cooldown_end')) || 0, // Таймер 5 минут между шагами
-            lastCertResetTime: parseInt(localStorage.getItem('g_cert_reset_time')) || 0, // Время сброса в 8:00 МСК
             
             localLeaderboardList: []
         };
@@ -625,88 +621,6 @@
                     mainChainOpenBtn.style.color = "#ffca28";
                 }
             }
-          // Сохранение новых переменных сертификатов в память устройства
-            localStorage.setItem('g_cert_step', GameStore.currentCertStep.toString());
-            localStorage.setItem('g_cert_cooldown_end', GameStore.certCooldownEnd.toString());
-            localStorage.setItem('g_cert_reset_time', GameStore.lastCertResetTime.toString());
-
-            // Управление кнопками и таймерами внутри списка сертификатов
-            const nowTime = Date.now();
-            for (let i = 1; i <= 5; i++) {
-                const btn = document.getElementById(`certBtn-${i}`);
-                if (btn) {
-                    if (i === GameStore.currentCertStep) {
-                        if (nowTime < GameStore.certCooldownEnd) {
-                            // Если шаг активен, но тикает 5-минутный кулдаун
-                            btn.disabled = true;
-                            btn.classList.remove('flashing-btn');
-                            btn.style.borderColor = "#2b2511";
-                            btn.style.color = "#554824";
-                            
-                            const diff = GameStore.certCooldownEnd - nowTime;
-                            const mins = Math.floor(diff / (1000 * 60));
-                            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-                            const formattedSecs = secs < 10 ? '0' + secs : secs;
-                            btn.innerText = `Подождите ⏳ 0${mins}:${formattedSecs}`;
-                        } else {
-                            // Если шаг активен и готов к просмотру
-                            btn.disabled = false;
-                            btn.classList.add('flashing-btn');
-                            btn.style.borderColor = "#00e5ff";
-                            btn.style.color = "#00e5ff";
-                            btn.innerText = "Смотреть рекламу";
-                        }
-                    } else if (i < GameStore.currentCertStep) {
-                        // Уже пройденные шаги
-                        btn.disabled = true;
-                        btn.classList.remove('flashing-btn');
-                        btn.innerText = "Забрано в Хранилище ✓";
-                    } else {
-                        // Будущие заблокированные шаги
-                        btn.disabled = true;
-                        btn.classList.remove('flashing-btn');
-                        btn.innerText = "Заблокировано 🔒";
-                    }
-                }
-            }
-
-            // Управление главной кнопкой открытия сертификатов в магазине
-            const mainCertOpenBtn = document.getElementById('mainCertOpenBtn');
-            if (mainCertOpenBtn) {
-                if (GameStore.currentCertStep > 5) {
-                    // Если вся цепочка сертификатов пройдена — включаем таймер до 8:00 МСК
-                    mainCertOpenBtn.disabled = true;
-                    mainCertOpenBtn.classList.remove('flashing-btn');
-                    mainCertOpenBtn.style.borderColor = "#2b2511";
-                    mainCertOpenBtn.style.color = "#554824";
-
-                    const timeNow = new Date();
-                    const mskOff = 3 * 60 * 60 * 1000;
-                    const nowMskTime = new Date(timeNow.getTime() + (timeNow.getTimezoneOffset() * 60 * 1000) + mskOff);
-                    
-                    const targetResetTime = new Date(nowMskTime);
-                    targetResetTime.setHours(8, 0, 0, 0);
-                    
-                    if (nowMskTime.getTime() >= targetResetTime.getTime()) {
-                        targetResetTime.setDate(targetResetTime.getDate() + 1);
-                    }
-
-                    const diffTime = targetResetTime.getTime() - nowMskTime.getTime();
-                    
-                    const hrs = Math.floor(diffTime / (1000 * 60 * 60));
-                    const mns = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
-                    const scs = Math.floor((diffTime % (1000 * 60)) / 1000);
-
-                    const fHrs = hrs < 10 ? '0' + hrs : hrs;
-                    const fMns = mns < 10 ? '0' + mns : mns;
-                    const fScs = scs < 10 ? '0' + scs : scs;
-
-                    mainCertOpenBtn.innerText = `Обновление через ⏳ ${fHrs}:${fMns}:${fScs}`;
-                } else {
-                    mainCertOpenBtn.disabled = false;
-                    mainCertOpenBtn.innerText = "Открыть сертификаты";
-                }
-            }  
         }
         // ====================================================
         // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
@@ -770,15 +684,6 @@
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
 
-            openCertConfirmModal: function(certStepNumber) {
-                if (certStepNumber !== GameStore.currentCertStep || Date.now() < GameStore.certCooldownEnd) return;
-                this.activeAdMode = "cert_" + certStepNumber; // Помечаем, что смотрится именно сертификат
-                const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
-                const certName = certsMap[certStepNumber] || "x2";
-                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам в Хранилище будет добавлен Сертификат ${certName}!`;
-                document.getElementById('confirmActionModal').style.display = 'flex';
-            },
-
             closeConfirmModal: function(isConfirmed) {
                 document.getElementById('confirmActionModal').style.display = 'none';
                 if (isConfirmed && this.activeAdMode !== null) {
@@ -806,18 +711,6 @@
                         GameStore.currentChainStep += 1; // Сдвигаем цепочку вперед
                         alert(`🎉 Награда получена! Вам начислено +${goldReward.toLocaleString()} G. Общий фонд турнира увеличен на +1 💎!`);
                     }
-                    
-                    } else if (typeof mode === 'string' && mode.startsWith("cert_")) {
-                        // Логика цепочки бустеров-сертификатов
-                        const currentStepNum = parseInt(mode.replace("cert_", ""));
-                        const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
-                        const awardedCert = certsMap[currentStepNum] || "x2";
-
-                        GameStore.totalPrizePool += 1; // ЖЕЛЕЗНО: +1 Алмаз в фонд турнира с каждого просмотра!
-                        GameStore.currentCertStep += 1; // Переводим цепочку сертификатов на следующий шаг
-                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000); // Запускаем жесткий таймер на 5 минут
-
-                        alert(`🎉 Успешно! Сертификат ${awardedCert} отправлен в ваше Хранилище. Общий фонд турнира увеличен на +1 💎! Следующий шаг доступен через 5 минут.`);
                     syncAndRefreshUI();
                     LeaderboardModule.refreshLeaderboard();
                 };
@@ -856,14 +749,6 @@
                     GameStore.singleAdCount = 0;
                     GameStore.singleAdCooldownEnd = 0;
                     GameStore.lastSingleAdResetTime = Date.now();
-                    syncAndRefreshUI();
-                }
-
-                // Сброс цепочки сертификатов в 8:00 по МСК
-                if (GameStore.lastCertResetTime < resetTimestamp) {
-                    GameStore.currentCertStep = 1; // Возвращаем на Шаг 1 (х2)
-                    GameStore.certCooldownEnd = 0; // Сбрасываем 5-минутный кулдаун, если он шёл
-                    GameStore.lastCertResetTime = Date.now();
                     syncAndRefreshUI();
                 }
             }
