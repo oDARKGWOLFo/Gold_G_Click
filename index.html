@@ -834,17 +834,22 @@
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
 
+            openCertConfirmModal: function(certStepNumber) {
+                if (certStepNumber !== GameStore.currentCertStep || Date.now() < GameStore.certCooldownEnd) return;
+                this.activeAdMode = "cert_" + certStepNumber;
+                const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
+                const certName = certsMap[certStepNumber] || "x2";
+                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам в Хранилище будет добавлен Сертификат ${certName}!`;
+                document.getElementById('confirmActionModal').style.display = 'flex';
+            },
+
             clickStorageCell: function(certName) {
                 const currentCount = GameStore.inventory[certName] || 0;
-                
-                // Жесткая проверка: если на руках 0 штук бустера — клик не срабатывает
                 if (currentCount <= 0) return;
-                
                 if (GameStore.activeMultiplierName && Date.now() < GameStore.activeMultiplierEnd) {
                     alert("У вас уже активен другой бустер! Дождитесь окончания его действия.");
                     return;
                 }
-
                 this.activeAdMode = "activate_" + certName;
                 document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите активировать Сертификат ${certName.toUpperCase()} на 10 минут? На руках: ${currentCount} шт. Каждое нажатие будет приносить больше золота G!`;
                 document.getElementById('confirmActionModal').style.display = 'flex';
@@ -855,14 +860,10 @@
                 if (isConfirmed && this.activeAdMode !== null) {
                     if (typeof this.activeAdMode === 'string' && this.activeAdMode.startsWith("activate_")) {
                         const certName = this.activeAdMode.replace("activate_", "");
-                        
-                        // Списываем строго -1 штуку из инвентаря при подтверждении активации
                         if ((GameStore.inventory[certName] || 0) > 0) {
                             GameStore.inventory[certName] -= 1;
-                            
                             GameStore.activeMultiplierName = certName;
-                            GameStore.activeMultiplierEnd = Date.now() + (10 * 60 * 1000); // 10 минут действия
-                            
+                            GameStore.activeMultiplierEnd = Date.now() + (10 * 60 * 1000);
                             alert(`🔥 Бустер ${certName.toUpperCase()} успешно активирован! Списано: 1 шт. Открывайте экран "Игра" и собирайте золото!`);
                         } else {
                             alert("Ошибка активации: предмет закончился.");
@@ -874,7 +875,7 @@
                 }
                 this.activeAdMode = null;
             },
-            
+
             executeAdsGramCall: function(mode) {
                 const AdController = window.AdsGram?.createAdListener({ blockId: "44331" });
                 
@@ -890,17 +891,17 @@
                         const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
                         const awardedCert = certsMap[currentStepNum] || "x2";
 
-                        GameStore.totalPrizePool += 1; // +1 Алмаз в фонд турнира
+                        GameStore.totalPrizePool += 1;
                         GameStore.currentCertStep += 1; 
-                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000);
-                        GameStore.inventory[awardedCert] = (GameStore.inventory[awardedCert] || 0) + 1; // Добавляем +1 шт. в инвентарь!
+                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000); 
+                        GameStore.inventory[awardedCert] = (GameStore.inventory[awardedCert] || 0) + 1;
                         alert(`🎉 Успешно! Сертификат ${awardedCert} отправлен в ваше Хранилище. Общий фонд турнира увеличен на +1 💎! Следующий шаг доступен через 5 минут.`);
                     } else {
                         const rewardsMap = { 1: 500, 2: 1000, 3: 2500, 4: 5000, 5: 10000 };
                         const goldReward = rewardsMap[mode] || 500;
                         
                         GameStore.gold += goldReward;
-                        GameStore.totalPrizePool += 1; // +1 Алмаз в фонд турнира
+                        GameStore.totalPrizePool += 1;
                         GameStore.currentChainStep += 1;
                         alert(`🎉 Награда получена! Вам начислено +${goldReward.toLocaleString()} G. Общий фонд турнира увеличен на +1 💎!`);
                     }
@@ -916,6 +917,7 @@
                     processReward();
                 }
             },
+
             checkDailyChainReset: function() {
                 const now = new Date();
                 const mskOffset = 3 * 60 * 60 * 1000;
@@ -930,14 +932,12 @@
 
                 const resetTimestamp = targetReset.getTime();
 
-                // Сброс золотой цепочки наград в 8:00 по МСК
                 if (GameStore.lastChainResetTime < resetTimestamp) {
                     GameStore.currentChainStep = 1;
                     GameStore.lastChainResetTime = Date.now();
                     syncAndRefreshUI();
                 }
 
-                // Сброс лимитов алмазов (5/5) и кулдаунов в 8:00 по МСК
                 if (GameStore.lastSingleAdResetTime < resetTimestamp) {
                     GameStore.singleAdCount = 0;
                     GameStore.singleAdCooldownEnd = 0;
@@ -945,14 +945,12 @@
                     syncAndRefreshUI();
                 }
 
-                // Сброс цепочки сертификатов в 8:00 по МСК и защита от залипания кнопок
                 if (GameStore.lastCertResetTime < resetTimestamp) {
                     GameStore.currentCertStep = 1;
                     GameStore.certCooldownEnd = 0;
                     GameStore.lastCertResetTime = Date.now();
                     syncAndRefreshUI();
                 } else {
-                    // Защитная проверка: если 8:00 МСК прошло, принудительно открываем клик для текущего шага
                     const nowMskTime = Date.now();
                     if (GameStore.certCooldownEnd > nowMskTime + (5 * 60 * 1000)) {
                         GameStore.certCooldownEnd = 0;
@@ -960,6 +958,7 @@
                     }
                 }
             }
+        };
 
         // ====================================================
         // 4. МАТЕМАТИЧЕСКИЙ МОДУЛЬ ТУРНИРА ТОП 100 ИГРОКОВ
