@@ -314,7 +314,13 @@
                     <div style="font-size: 0.95rem; font-weight: bold; color: #ffca28;">🔥 Цепочка наград</div>
                     <div style="font-size: 0.8rem; color: #8986a3;">Забирайте до <span style="color: #ffca28;">+10 000 G</span> за просмотры каждый день!</div>
                     <button class="item-card-btn flashing-btn" onclick="NavModule.openChainPanel()">Открыть список наград</button>
+                    <!-- КНОПКА №3: ТРЕТЬЯ КНОПКА СНИЗУ! Цепочка бустеров-сертификатов -->
+                <div class="item-card">
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #00e5ff;">🎫 Цепочка Сертификатов G</div>
+                    <div style="font-size: 0.8rem; color: #8986a3;">Собирайте множители от <span style="color: #00e5ff;">x2 до x10</span> каждые 5 минут!</div>
+                    <button id="mainCertOpenBtn" class="item-card-btn flashing-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="NavModule.openCertPanel()">Открыть сертификаты</button>
                 </div>
+            </div>
 
             </div>
         </div>
@@ -374,6 +380,59 @@
         </div>
     </div>
 
+   <!-- ==================================================== -->
+    <!-- НОВОЕ ОТДЕЛЬНОЕ ОКНО: СПИСОК ШАГОВ СЕРТИФИКАТОВ      -->
+    <!-- ==================================================== -->
+    <div id="certRewardsModal" class="modal" style="z-index: 1060;">
+        <div class="modal-content" style="max-width: 360px; border-color: #00e5ff;">
+            <!-- Кнопка закрытия панели и возврата в магазин -->
+            <span class="modal-close" style="color: #00e5ff; position: absolute; top: 15px; right: 15px; font-size: 1.4rem; cursor: pointer; font-weight: bold;" onclick="NavModule.closeCertPanel()">&times;</span>
+            <div class="modal-title" style="color: #00e5ff; font-size: 1.2rem; text-align: center; margin-bottom: 5px; font-weight: bold;">🎫 Цепочка Сертификатов G</div>
+            <div style="font-size: 0.8rem; color: #8986a3; text-align: center; margin-bottom: 15px;">Кулдаун 5 минут. Сброс каждый день в 8:00 по МСК</div>
+
+            <div class="shop-list-container" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <!-- Шаг 1: х2 -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px; border-color: #00e5ff;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 1: 🎫 Сертификат</span> <span style="color: #00e5ff;">x2 клик</span>
+                    </div>
+                    <button id="certBtn-1" class="item-card-btn flashing-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="AppLogic.openCertConfirmModal(1)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 2: х3 -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px; border-color: #00e5ff;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 2: 🎫 Сертификат</span> <span style="color: #00e5ff;">x3 клик</span>
+                    </div>
+                    <button id="certBtn-2" class="item-card-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="AppLogic.openCertConfirmModal(2)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 3: х4 -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px; border-color: #00e5ff;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 3: 🎫 Сертификат</span> <span style="color: #00e5ff;">x4 клик</span>
+                    </div>
+                    <button id="certBtn-3" class="item-card-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="AppLogic.openCertConfirmModal(3)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 4: х5 -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px; border-color: #00e5ff;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 4: 🎫 Сертификат</span> <span style="color: #00e5ff;">x5 клик</span>
+                    </div>
+                    <button id="certBtn-4" class="item-card-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="AppLogic.openCertConfirmModal(4)">Смотреть рекламу</button>
+                </div>
+
+                <!-- Шаг 5: х10 -->
+                <div class="item-card" style="padding: 12px; margin-bottom: 0; gap: 6px; border-color: #00e5ff;">
+                    <div style="font-size: 0.85rem; font-weight: bold; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Шаг 5: 👑 МЕГА МНОЖИТЕЛЬ</span> <span style="color: #00e5ff; font-weight: bold;">x10 клик</span>
+                    </div>
+                    <button id="certBtn-5" class="item-card-btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="AppLogic.openCertConfirmModal(5)">Смотреть рекламу</button>
+                </div>
+            </div>
+        </div>
+    </div> 
     <!-- ВССПЛЫВАЮЩЕЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЕЙСТВИЯ (CONFIRM) -->
     <!-- ==================================================== -->
     <!-- НОВЫЙ РАЗДЕЛ: ЭКРАН «ХРАНИЛИЩЕ» (ПУСТЫЕ КВАДРАТЫ)    -->
@@ -578,6 +637,7 @@
             },
             backToMenu: function() {
                 this.closeChainPanel();
+                this.closeCertPanel(); // Железно закрываем окно сертификатов при выходе
                 if(document.getElementById('storageScreen')) document.getElementById('storageScreen').style.display = 'none';
                 document.querySelectorAll('.screen-overlay').forEach(scr => scr.style.display = 'none');
                 document.getElementById('mainMenuScreen').style.display = 'flex';
@@ -587,9 +647,15 @@
             },
             closeChainPanel: function() {
                 document.getElementById('chainRewardsModal').style.display = 'none';
+            },
+            // НОВЫЕ ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ ОКНОМ СЕРТИФИКАТОВ
+            openCertPanel: function() {
+                document.getElementById('certRewardsModal').style.display = 'flex';
+            },
+            closeCertPanel: function() {
+                document.getElementById('certRewardsModal').style.display = 'none';
             }
         };
-
         // ====================================================
         // 3. ИГРОВАЯ ЛОГИКА (КЛИКЕР, CONFIRM, СБРОС МСК И РЕКЛАМА)
         // ====================================================
