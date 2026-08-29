@@ -625,6 +625,7 @@
                     mainChainOpenBtn.style.color = "#ffca28";
                 }
             }
+        }
           // Сохранение новых переменных сертификатов в память устройства
             localStorage.setItem('g_cert_step', GameStore.currentCertStep.toString());
             localStorage.setItem('g_cert_cooldown_end', GameStore.certCooldownEnd.toString());
@@ -705,8 +706,7 @@
                 } else {
                     mainCertOpenBtn.disabled = false;
                     mainCertOpenBtn.innerText = "Открыть сертификаты";
-                }
-            }  
+                }  
         }
         // ====================================================
         // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
