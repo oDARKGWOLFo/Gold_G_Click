@@ -514,6 +514,9 @@
 
             activeMultiplierName: localStorage.getItem('g_active_mult_name') || null, // Имя бустера, например "x2"
             activeMultiplierEnd: parseInt(localStorage.getItem('g_active_mult_end')) || 0, // Таймер окончания бустера
+
+            // Новая система инвентаря штук: считаем сколько каждого бустера на руках
+            inventory: JSON.parse(localStorage.getItem('g_inventory')) || { "x2": 0, "x3": 0, "x4": 0, "x5": 0, "x10": 0 },
             
             localLeaderboardList: []
         };
@@ -742,24 +745,32 @@
                 }
             }
 
-            // ОТРИСОВКА СЕРТИФИКАТОВ ВНУТРИ СЕТКИ ХРАНИЛИЩА
-            const certCells = { "x2": 1, "x3": 2, "x4": 3, "x5": 4, "x10": 5 };
-            for (let [certKey, stepVal] of Object.entries(certCells)) {
+            // Автосохранение количества инвентаря в локальную память устройства
+            localStorage.setItem('g_inventory', JSON.stringify(GameStore.inventory));
+
+            // НОВАЯ ОТРИСОВКА СЕРТИФИКАТОВ С ПОДЧЕТОМ КОЛИЧЕСТВА ШТУК ШРИФТОМ 0.7rem В УГЛУ
+            const certCells = ["x2", "x3", "x4", "x5", "x10"];
+            certCells.forEach(certKey => {
                 const cell = document.getElementById(`cell-${certKey}`);
                 if (cell) {
-                    if (GameStore.currentCertStep > stepVal) {
-                        // Если шаг цепочки уже пройден — сертификат лежит в Хранилище
-                        cell.innerText = certKey.toUpperCase();
+                    const count = GameStore.inventory[certKey] || 0;
+                    if (count > 0) {
+                        // Если бустеры есть в наличии — рисуем имя по центру и количество в правом нижнем углу
+                        cell.style.position = "relative";
                         cell.style.color = "#00e5ff";
                         cell.style.borderColor = "#00e5ff";
+                        cell.innerHTML = `
+                            <span style="font-size: 1.1rem; font-weight: bold;">${certKey.toUpperCase()}</span>
+                            <span style="position: absolute; bottom: 4px; right: 6px; font-size: 0.7rem; color: #00e5ff; font-weight: bold; opacity: 0.85;">${count}шт</span>
+                        `;
                     } else {
-                        // Если еще не заработан — ячейка пустая
-                        cell.innerText = "+";
+                        // Если 0 штук — ячейка тухнет и превращается обратно в пустой плюс
                         cell.style.color = "rgba(255, 202, 40, 0.3)";
                         cell.style.borderColor = "#ffca28";
+                        cell.innerHTML = `<span style="font-size: 1.4rem;">+</span>`;
                     }
                 }
-            }
+            });
         }
         // ====================================================
         // 2. МОДУЛЬ НАВИГАЦИИ (УПРАВЛЕНИЕ ОКНАМИ)
@@ -822,30 +833,20 @@
                 document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам будет начислено +${goldReward.toLocaleString()} G!`;
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
+
             clickStorageCell: function(certName) {
-                const certsMap = { "x2": 1, "x3": 2, "x4": 3, "x5": 4, "x10": 5 };
-                const stepVal = certsMap[certName];
+                const currentCount = GameStore.inventory[certName] || 0;
                 
-                // Если бустер еще не заработан в Магазине, ничего не делаем
-                if (GameStore.currentCertStep <= stepVal) return;
+                // Жесткая проверка: если на руках 0 штук бустера — клик не срабатывает
+                if (currentCount <= 0) return;
                 
-                // Если какой-то бустер уже тикает прямо сейчас, не даем включить новый
                 if (GameStore.activeMultiplierName && Date.now() < GameStore.activeMultiplierEnd) {
                     alert("У вас уже активен другой бустер! Дождитесь окончания его действия.");
                     return;
                 }
 
-                this.activeAdMode = "activate_" + certName; // Ставим специальную метку активации
-                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите активировать Сертификат ${certName.toUpperCase()} на 10 минут? Каждое нажатие будет приносить больше золота G!`;
-                document.getElementById('confirmActionModal').style.display = 'flex';
-            },
-
-            openCertConfirmModal: function(certStepNumber) {
-                if (certStepNumber !== GameStore.currentCertStep || Date.now() < GameStore.certCooldownEnd) return;
-                this.activeAdMode = "cert_" + certStepNumber;
-                const certsMap = { 1: "x2", 2: "x3", 3: "x4", 4: "x5", 5: "x10" };
-                const certName = certsMap[certStepNumber] || "x2";
-                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите посмотреть рекламу? После просмотра вам в Хранилище будет добавлен Сертификат ${certName}!`;
+                this.activeAdMode = "activate_" + certName;
+                document.getElementById('confirmModalBodyText').innerText = `Вы действительно хотите активировать Сертификат ${certName.toUpperCase()} на 10 минут? На руках: ${currentCount} шт. Каждое нажатие будет приносить больше золота G!`;
                 document.getElementById('confirmActionModal').style.display = 'flex';
             },
 
@@ -853,16 +854,21 @@
                 document.getElementById('confirmActionModal').style.display = 'none';
                 if (isConfirmed && this.activeAdMode !== null) {
                     if (typeof this.activeAdMode === 'string' && this.activeAdMode.startsWith("activate_")) {
-                        // Логика мгновенной активации бустера без просмотра новой рекламы
                         const certName = this.activeAdMode.replace("activate_", "");
                         
-                        GameStore.activeMultiplierName = certName;
-                        GameStore.activeMultiplierEnd = Date.now() + (10 * 60 * 1000); // Ровно 10 минут действия!
-                        
-                        alert(`🔥 Бустер ${certName.toUpperCase()} успешно активирован на 10 минут! Открывайте экран "Игра" и собирайте золото!`);
+                        // Списываем строго -1 штуку из инвентаря при подтверждении активации
+                        if ((GameStore.inventory[certName] || 0) > 0) {
+                            GameStore.inventory[certName] -= 1;
+                            
+                            GameStore.activeMultiplierName = certName;
+                            GameStore.activeMultiplierEnd = Date.now() + (10 * 60 * 1000); // 10 минут действия
+                            
+                            alert(`🔥 Бустер ${certName.toUpperCase()} успешно активирован! Списано: 1 шт. Открывайте экран "Игра" и собирайте золото!`);
+                        } else {
+                            alert("Ошибка активации: предмет закончился.");
+                        }
                         syncAndRefreshUI();
                     } else {
-                        // Для всей остальной рекламы (алмазы, золото, получение сертификатов)
                         this.executeAdsGramCall(this.activeAdMode);
                     }
                 }
@@ -886,7 +892,8 @@
 
                         GameStore.totalPrizePool += 1; // +1 Алмаз в фонд турнира
                         GameStore.currentCertStep += 1; 
-                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000); 
+                        GameStore.certCooldownEnd = Date.now() + (5 * 60 * 1000);
+                        GameStore.inventory[awardedCert] = (GameStore.inventory[awardedCert] || 0) + 1; // Добавляем +1 шт. в инвентарь!
                         alert(`🎉 Успешно! Сертификат ${awardedCert} отправлен в ваше Хранилище. Общий фонд турнира увеличен на +1 💎! Следующий шаг доступен через 5 минут.`);
                     } else {
                         const rewardsMap = { 1: 500, 2: 1000, 3: 2500, 4: 5000, 5: 10000 };
