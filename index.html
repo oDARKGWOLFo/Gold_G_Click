@@ -1064,6 +1064,9 @@
                 
                 GameStore.gold = 0;
                 GameStore.totalPrizePool = 1684;
+
+                localStorage.setItem('g_click_diamonds', GameStore.diamonds.toString());
+                
                 syncAndRefreshUI();
             },
             
