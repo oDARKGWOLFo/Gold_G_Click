@@ -1042,11 +1042,35 @@
                     targetList.appendChild(rowDiv);
                 });
             },
+
+            claimSeasonRewards: function() {
+                this.refreshLeaderboard();
+                const myIndex = GameStore.localLeaderboardList.findIndex(p => p.id === "me");
+                const myPosition = myIndex !== -1 ? myIndex + 1 : 100;
+                
+                let myPercentReward = 0;
+                if (myPosition === 1) myPercentReward = Math.round(GameStore.totalPrizePool * 0.25);
+                else if (myPosition === 2) myPercentReward = Math.round(GameStore.totalPrizePool * 0.15);
+                else if (myPosition === 3) myPercentReward = Math.round(GameStore.totalPrizePool * 0.10);
+                else if (myPosition >= 4 && myPosition <= 10) myPercentReward = Math.round((GameStore.totalPrizePool * 0.14) / 7);
+                else if (myPosition >= 11 && myPosition <= 30) myPercentReward = Math.round((GameStore.totalPrizePool * 0.20) / 20);
+                else if (myPosition >= 31 && myPosition <= 60) myPercentReward = Math.round((GameStore.totalPrizePool * 0.12) / 30);
+                else if (myPosition >= 61 && myPosition <= 100) myPercentReward = Math.round((GameStore.totalPrizePool * 0.04) / 40);
+
+                if (myPercentReward < 1) myPercentReward = 1;
+
+                GameStore.diamonds += myPercentReward;
+                alert(`⏱ Турнирный сезон завершен!\nВы заняли ${myPosition} место и получили награду: ${myPercentReward} 💎\nБалансы G обнулены, запущен новый раунд!`);
+                
+                GameStore.gold = 0;
+                GameStore.totalPrizePool = 1684;
+                syncAndRefreshUI();
+            },
+            
             initTimer: function() {
                 const getNextMondayResetMsk = () => {
                     const now = new Date();
                     const mskOffset = 3 * 60 * 60 * 1000;
-                    // Переводим текущее время в МСК
                     const nowMsk = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + mskOffset);
                     
                     const resultDate = new Date(nowMsk);
@@ -1056,16 +1080,22 @@
                     resultDate.setDate(nowMsk.getDate() + daysUntilMonday);
                     resultDate.setHours(8, 0, 0, 0);
                     
-                    // Если сегодня понедельник и 8 утра прошло — сдвигаем на неделю вперед
                     if (currentDay === 1 && nowMsk.getTime() >= resultDate.getTime()) {
                         resultDate.setDate(resultDate.getDate() + 7);
                     }
-                    
-                    // Возвращаем реальный UTC-таймстамп для сравнения
                     return resultDate.getTime() - mskOffset - (now.getTimezoneOffset() * 60 * 1000);
                 };
 
-                GameStore.nextResetTime = getNextMondayResetMsk();
+                // ЖЕЛЕЗНАЯ ПРОВЕРКА: Если время прошлого сброса уже позади, а игра была закрыта
+                if (GameStore.nextResetTime > 0 && Date.now() >= GameStore.nextResetTime) {
+                    this.claimSeasonRewards(); // Принудительно выдаем алмазы, обнуляем G и ставим фонд 1684!
+                    GameStore.nextResetTime = getNextMondayResetMsk();
+                }
+
+                // Защита для самого первого запуска игры
+                if (GameStore.nextResetTime === 0) {
+                    GameStore.nextResetTime = getNextMondayResetMsk();
+                }
 
                 setInterval(() => {
                     const now = Date.now();
