@@ -1079,8 +1079,6 @@
             },
             
             initTimer: function() {
-                // ВРЕМЕННЫЙ ТЕСТ: Сезон принудительно закроется через 60 секунд после входа в игру!
-                GameStore.nextResetTime = Date.now() + (60 * 1000);
                 const getNextMondayResetMsk = () => {
                     const now = new Date();
                     const mskOffset = 3 * 60 * 60 * 1000;
