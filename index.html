@@ -1059,13 +1059,21 @@
 
                 if (myPercentReward < 1) myPercentReward = 1;
 
+                // Прибавляем и сразу намертво сохраняем до вызова алерта
                 GameStore.diamonds += myPercentReward;
-                alert(`⏱ Турнирный сезон завершен!\nВы заняли ${myPosition} место и получили награду: ${myPercentReward} 💎\nБалансы G обнулены, запущен новый раунд!`);
-                
                 GameStore.gold = 0;
                 GameStore.totalPrizePool = 1684;
-
+                
                 localStorage.setItem('g_click_diamonds', GameStore.diamonds.toString());
+                localStorage.setItem('g_click_gold', "0");
+                localStorage.setItem('g_prize_pool', "1684");
+                
+                // Обновляем текст на экране до вылета окна блокировки
+                document.getElementById('gameDiamBal').innerText = GameStore.diamonds;
+                document.getElementById('gameGoldBal').innerText = "0";
+                if(document.getElementById('prizePoolTxt')) document.getElementById('prizePoolTxt').innerText = "1684";
+                
+                alert(`⏱ Турнирный сезон завершен!\nВы заняли ${myPosition} место и получили награду: ${myPercentReward} 💎\nБалансы G обнулены, запущен новый раунд!`);
                 
                 syncAndRefreshUI();
             },
