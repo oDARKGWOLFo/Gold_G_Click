@@ -1110,17 +1110,15 @@
                     GameStore.nextResetTime = getNextMondayResetMsk();
                 }
 
-                setInterval(() => {
+                let seasonInterval = setInterval(() => {
                     const now = Date.now();
                     const tDiff = GameStore.nextResetTime - now;
                     
                     if (tDiff <= 0) {
-                        alert("⏱ Турнирный сезон завершен! Балансы G обнулены, запущен новый раунд.");
-                        GameStore.gold = 0;
-                        GameStore.totalPrizePool = 1684;
+                        clearInterval(seasonInterval);
+                        this.claimSeasonRewards();
                         GameStore.nextResetTime = getNextMondayResetMsk();
-                        syncAndRefreshUI();
-                        this.refreshLeaderboard();
+                        this.initTimer();
                         return;
                     }
                     
@@ -1130,8 +1128,6 @@
                     const s = Math.floor((tDiff % (1000 * 60)) / 1000);
                     
                     document.getElementById('seasonTimerDisplay').innerText = `До обнуления: ${d}д ${h}ч ${m}м ${s}с`;
-                    
-                    // Обновляем весь интерфейс каждую секунду (для кулдауна кнопок)
                     syncAndRefreshUI();
                 }, 1000);
             }
